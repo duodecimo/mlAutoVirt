@@ -1,0 +1,31 @@
+<scene formatVersion="1.0.1" previous_export_time="0" export_time="1468850291.0038493" exported_by="duo" >
+  <nodes >
+    <node name="Carro" >
+      <position y="-0.116770" x="-0.000014" z="-0.183987" />
+      <rotation qx="0.000000" qw="1.000000" qy="0.000000" qz="-0.000000" />
+      <scale y="1.000000" x="1.000000" z="1.000000" />
+      <user_data type="IDPropertyGroup" name="cycles" value='&lt;bpy id prop: owner="OBCarro", name="cycles", address=0x7f0ce876f708&gt;' />
+      <user_data type="IDPropertyGroup" name="cycles_visibility" value='&lt;bpy id prop: owner="OBCarro", name="cycles_visibility", address=0x7f0ce876f668&gt;' />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity velocity_min="0.0" meshFile="Plane.mesh" lock_rot_z="False" physics_type="STATIC" friction_x="1.0" ghost="False" friction_y="1.0" lock_rot_x="False" velocity_max="0.0" friction_z="1.0" damping_rot="0.10000000149011612" inertia_tensor="0.4000000059604645" lock_trans_x="False" mass_radius="1.0" lock_rot_y="False" anisotropic_friction="False" lock_trans_y="False" lock_trans_z="False" actor="False" name="Plane" damping_trans="0.03999999910593033" mass="1.0" >
+        <user_data type="IDPropertyGroup" name="cycles" value='&lt;bpy id prop: owner="MEPlane", name="cycles", address=0x7f0ce7fe1428&gt;' />
+      </entity>
+    </node>
+  </nodes>
+  <externals >
+    <item type="material" >
+      <file name="/home/duo/Imagens/car1stperson/ogre/Material.001.material" />
+    </item>
+    <item type="material" >
+      <file name="/home/duo/Imagens/car1stperson/ogre/Material.002.material" />
+    </item>
+  </externals>
+  <environment >
+    <colourBackground g="0.05087608844041824" r="0.05087608844041824" b="0.05087608844041824" />
+    <colourAmbient g="0.0" r="0.0" b="0.0" />
+    <colourDiffuse g="0.05087608844041824" r="0.05087608844041824" b="0.05087608844041824" />
+  </environment>
+</scene>
