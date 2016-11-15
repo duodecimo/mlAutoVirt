@@ -56,19 +56,25 @@ public class InputAppState
     public void onAnalog(String name, float value, float tpf) {
         if(name.equals(InputMapping.MoveFoward.name())) {
             speed += 0.5f;
-            if(speed>100.0f) speed = 100.0f;
+            // set max speed
+            if(speed>80.0f) speed = 80.0f;
         } else if(name.equals(InputMapping.MoveBackward.name())) {
             speed -= 1.0f;
+            // no back moving
             if(speed<0.0f) speed = 0.0f;
         }
         else if(name.equals(InputMapping.RotateLeft.name())) {
             angle += 0.005f;
+            // when close to straight, make direction straight
             if(angle<=0.0f && angle > -1.0f) angle = 0.0f;
+            // max positive angle
             if(angle>5.0f) angle = 5.0f;
         }
         else if(name.equals(InputMapping.RotateRight.name())) {
             angle -= 0.005f;
+            // when close to straight, make direction straight
             if(angle>=0.0f && angle < 1.0f) angle = 0.0f;
+            // max negative angle
             if(angle<-5.0f) angle = -5.0f;
         }
 

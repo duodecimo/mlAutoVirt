@@ -1,8 +1,10 @@
 package org.duo.ml.autovirt;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.font.BitmapText;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -32,9 +34,9 @@ public class Main extends SimpleApplication {
     //terrain common
     private Node terrain;
     //Materials
-    Material matRock;
-    Material matBullet;
-    
+    private Material matRock;
+    private Material matBullet;
+    private BitmapText hudText;
 
     public Main() {
         super(new ConfigAppState());
@@ -50,51 +52,44 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
         createTerrain();
         rootNode.addLight(new AmbientLight());
-        //flyCam.setEnabled(false);
-        //Spatial gameLevel = assetManager.loadModel("Scenes/scene.j3o");
-        //gameLevel.setLocalTranslation(0, -5.2f, 0);
-        //gameLevel.setLocalScale(2);
-        //rootNode.attachChild(gameLevel);
         inputAppState = new InputAppState();
         stateManager.attach(inputAppState);
         car = assetManager.loadModel("Models/Carroblend01.j3o");
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
         car.setMaterial(mat);
         car.setCullHint(Spatial.CullHint.Never);
-        //car.scale(2.0f);
         car.scale(2.0f);
         Quaternion quaternion = new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y);
         car.rotate(quaternion);
-        //car.setLocalTranslation(0.0f, -0.5f, 0.0f);
-        //car.setLocalTranslation(0.0f, 2.0f, 0.0f);
         car.setLocalTranslation(0.0f, 2.0f, 0.0f);
         carNode = new Node("carNode");
         carNode.attachChild(car);
-        //carNode.setLocalTranslation(0.0f, -1.0f, 0.0f);
         carNode.setLocalTranslation(0.0f, 0.8f, 0.0f);
         carNode.addControl(new TerrainTrackControl());
         carNode.addControl(new MovementControl(this));
         cameraNode = new CameraNode("cameraNode", cam);
-        //cameraNode.setLocalTranslation(new Vector3f(-3.0f, 0.0f, 0.0f));
-        //cameraNode.setLocalTranslation(new Vector3f(-3.5f, 3.0f, 0.0f));
         cameraNode.setLocalTranslation(new Vector3f(-3.5f, 3.0f, 0.0f));
-        //Vector3f lookAtVector = carNode.getLocalTranslation();
-        //lookAtVector.x = lookAtVector.x + 10;
         Vector3f lookAtVector = carNode.getLocalTranslation();
         lookAtVector.x = lookAtVector.x + 10;
         cameraNode.lookAt(lookAtVector, Vector3f.UNIT_Y);
-        //cameraNode.setLocalTranslation(new Vector3f(0.0f, 0.002f, 0.0f));
         cameraNode.setControlDir(CameraControl.ControlDirection.SpatialToCamera);
         Vector3f camLeft = cam.getDirection().negate();
         carNode.attachChild(cameraNode);
-        //car.move(camLeft.multLocal(0.08f));
         carSpeed = 0.0f;
         rootNode.attachChild(carNode);
+        hudText = new BitmapText(guiFont, false);
+        hudText.setSize(guiFont.getCharSet().getRenderedSize());      // font size
+        hudText.setColor(ColorRGBA.Blue);                             // font color
+        hudText.setText("ML AutoVirt");          // the text
+        hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
+        guiNode.attachChild(hudText);
     }
 
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
+        hudText.setText("Speed: " + getInputAppState().getSpeed() +
+                " angle: " + getInputAppState().getAngle());
     }
 
     private void createTerrain() {
