@@ -77,6 +77,7 @@ public class Main extends SimpleApplication {
         carNode.attachChild(cameraNode);
         carSpeed = 0.0f;
         rootNode.attachChild(carNode);
+        carNode.setLocalTranslation(120.449646f, -38.18f, 116.01076f);
         hudText = new BitmapText(guiFont, false);
         hudText.setSize(guiFont.getCharSet().getRenderedSize());      // font size
         hudText.setColor(ColorRGBA.Blue);                             // font color
@@ -88,8 +89,11 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
-        hudText.setText("Speed: " + getInputAppState().getSpeed() +
-                " angle: " + getInputAppState().getAngle());
+    hudText.setText("Speed: " + getInputAppState().getSpeed() +
+                " angle: " + getInputAppState().getAngle() +
+                " pos: (" + carNode.getLocalTranslation().x + ", " +
+                carNode.getLocalTranslation().y + ", " +
+                carNode.getLocalTranslation().z + ")");
     }
 
     private void createTerrain() {

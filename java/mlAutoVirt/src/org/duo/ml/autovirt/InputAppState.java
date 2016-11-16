@@ -24,7 +24,11 @@ public class InputAppState
     private InputManager inputManager;
     private float speed;
     private float angle;
-
+    private final float MAXSPEED = 80.0f;
+    private final float INCSPEED = 1.0f;
+    private final float MAXANGLE = 5.0f;
+    private final float INCANGLE = 0.005f;
+    
     public enum InputMapping {
         RotateLeft, RotateRight, MoveFoward, MoveBackward;
     }
@@ -54,30 +58,39 @@ public class InputAppState
     
     @Override
     public void onAnalog(String name, float value, float tpf) {
-        if(name.equals(InputMapping.MoveFoward.name())) {
-            speed += 0.5f;
+        if (name.equals(InputMapping.MoveFoward.name())) {
+            speed += INCSPEED;
             // set max speed
-            if(speed>80.0f) speed = 80.0f;
-        } else if(name.equals(InputMapping.MoveBackward.name())) {
-            speed -= 1.0f;
+            if (speed > MAXSPEED) {
+                speed = MAXSPEED;
+            }
+        } else if (name.equals(InputMapping.MoveBackward.name())) {
+            speed -= INCSPEED;
             // no back moving
-            if(speed<0.0f) speed = 0.0f;
+            if (speed < 0.0f) {
+                speed = 0.0f;
+            }
+        } else if (name.equals(InputMapping.RotateLeft.name())) {
+            angle += INCANGLE;
+        } else if (name.equals(InputMapping.RotateRight.name())) {
+            angle -= INCANGLE;
         }
-        else if(name.equals(InputMapping.RotateLeft.name())) {
-            angle += 0.005f;
-            // when close to straight, make direction straight
-            if(angle<=0.0f && angle > -1.0f) angle = 0.0f;
-            // max positive angle
-            if(angle>5.0f) angle = 5.0f;
+        // when close to straight, make direction straight
+        if (angle <= 0.0f && angle > -0.003f) {
+            angle = 0.0f;
         }
-        else if(name.equals(InputMapping.RotateRight.name())) {
-            angle -= 0.005f;
-            // when close to straight, make direction straight
-            if(angle>=0.0f && angle < 1.0f) angle = 0.0f;
-            // max negative angle
-            if(angle<-5.0f) angle = -5.0f;
+        // max positive angle
+        if (angle > MAXANGLE) {
+            angle = MAXANGLE;
         }
-
+        // when close to straight, make direction straight
+        if (angle >= 0.0f && angle < 0.003f) {
+            angle = 0.0f;
+        }
+        // max negative angle
+        if (angle < -MAXANGLE) {
+            angle = -MAXANGLE;
+        }
     }
 
     @Override
