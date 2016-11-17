@@ -21,6 +21,7 @@ import com.jme3.input.controls.KeyTrigger;
 public class InputAppState 
     extends AbstractAppState 
     implements ActionListener, AnalogListener {
+    private Application app;
     private InputManager inputManager;
     private float speed;
     private float angle;
@@ -30,7 +31,7 @@ public class InputAppState
     private final float INCANGLE = 0.005f;
     
     public enum InputMapping {
-        RotateLeft, RotateRight, MoveFoward, MoveBackward;
+        RotateLeft, RotateRight, MoveFoward, MoveBackward, Print;
     }
 
     private void addInputMappings() {
@@ -42,6 +43,8 @@ public class InputAppState
                 new KeyTrigger(KeyInput.KEY_UP));
         inputManager.addMapping(InputMapping.MoveBackward.name(), 
                 new KeyTrigger(KeyInput.KEY_DOWN));
+        inputManager.addMapping(InputMapping.Print.name(),
+                new KeyTrigger(KeyInput.KEY_P));
         for(InputMapping i : InputMapping.values()) {
             inputManager.addListener(this, i.name());
         }
@@ -54,6 +57,7 @@ public class InputAppState
         addInputMappings();
         speed = 0.0f;
         angle = 0.0f;
+        this.app = app;
     }
     
     @Override
@@ -95,6 +99,12 @@ public class InputAppState
 
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
+        if(name.equals(InputMapping.Print.name())){
+            if(isPressed) {
+                ((Main) app).getScreenshotAppState().takeScreenshot();
+                System.out.println("Screenshot taken!");
+            }
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.duo.ml.autovirt;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.font.BitmapText;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
@@ -28,6 +29,9 @@ public class Main extends SimpleApplication {
     private CameraNode cameraNode;
     private float carSpeed;
     private InputAppState inputAppState;
+    private ScreenshotAppState screenshotAppState;
+    public long shtIndex = 0L;
+    private final String SCREENSHOTPATH = "/home/duo/Imagens/mlAutoVirt/";
 
     
     private TerrainQuad terrainQuad;
@@ -84,6 +88,16 @@ public class Main extends SimpleApplication {
         hudText.setText("ML AutoVirt");          // the text
         hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
         guiNode.attachChild(hudText);
+        screenshotAppState = new ScreenshotAppState();
+        screenshotAppState.setFilePath(SCREENSHOTPATH);
+        screenshotAppState.setFileName("mlAutoVirt");
+        screenshotAppState.setIsNumbered(true);
+        screenshotAppState.setShotIndex(shtIndex);
+        this.stateManager.attach(screenshotAppState);
+    }
+
+    public ScreenshotAppState getScreenshotAppState() {
+        return screenshotAppState;
     }
 
     @Override
