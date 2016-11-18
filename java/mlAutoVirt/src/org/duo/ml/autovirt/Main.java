@@ -9,6 +9,9 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
+import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.ViewPort;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -16,14 +19,25 @@ import com.jme3.scene.control.CameraControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
+import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Texture;
+import com.jme3.util.BufferUtils;
 import com.jme3.util.SkyFactory;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * test
+ *
  * @author normenhansen
  */
 public class Main extends SimpleApplication {
+
     private Node carNode;
     private Spatial car;
     private CameraNode cameraNode;
@@ -32,8 +46,9 @@ public class Main extends SimpleApplication {
     private ScreenshotAppState screenshotAppState;
     public long shtIndex = 0L;
     private final String SCREENSHOTPATH = "/home/duo/Imagens/mlAutoVirt/";
+    private File temp;
+    private BufferedWriter bufferedWriter;
 
-    
     private TerrainQuad terrainQuad;
     //terrain common
     private Node terrain;
@@ -45,7 +60,6 @@ public class Main extends SimpleApplication {
     public Main() {
         super(new ConfigAppState());
     }
-    
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -88,7 +102,60 @@ public class Main extends SimpleApplication {
         hudText.setText("ML AutoVirt");          // the text
         hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
         guiNode.attachChild(hudText);
-        screenshotAppState = new ScreenshotAppState();
+        screenshotAppState = new ScreenshotAppState() {
+            RenderManager localRM;
+            int localwidth;
+            int localheight;
+            ByteBuffer localoutBuf;
+
+            @Override
+            public void initialize(RenderManager rm, ViewPort vp) {
+                super.initialize(rm, vp);
+                renderer = rm.getRenderer();
+                localRM = rm;
+            }
+
+            @Override
+            public void reshape(ViewPort vp, int w, int h) {
+                super.reshape(vp, w, h);
+                localoutBuf = BufferUtils.createByteBuffer(w * h * 4);
+                localwidth = w;
+                localheight = h;
+            }
+
+            @Override
+            public void postFrame(FrameBuffer out) {
+                super.postFrame(out);
+                Camera curCamera = localRM.getCurrentCamera();
+                int viewX = (int) (curCamera.getViewPortLeft() * curCamera.getWidth());
+                int viewY = (int) (curCamera.getViewPortBottom() * curCamera.getHeight());
+                int viewWidth = (int) ((curCamera.getViewPortRight() - curCamera.getViewPortLeft()) * curCamera.getWidth());
+                int viewHeight = (int) ((curCamera.getViewPortTop() - curCamera.getViewPortBottom()) * curCamera.getHeight());
+
+                renderer.setViewPort(0, 0, localwidth, localheight);
+                renderer.readFrameBuffer(out, localoutBuf);
+                for (int i = 0; i < (localwidth * localheight * 4); i++) {
+                    try {
+                        if (temp == null) {
+                            //create a temp file
+                            temp = File.createTempFile("mlAutovirtImageBytes", ".tmp");
+                            bufferedWriter = new BufferedWriter(new FileWriter(temp));
+                            System.out.println("Temp file : " + temp.getAbsolutePath());
+                        }
+                        // write data header
+                        bufferedWriter.write(localoutBuf.get(i));
+                        if (i < (localwidth * localheight * 4) - 1) {
+                            bufferedWriter.write(" ");
+                        } else {
+                            bufferedWriter.write("\n");
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                renderer.setViewPort(viewX, viewY, viewWidth, viewHeight);
+            }
+        };
         screenshotAppState.setFilePath(SCREENSHOTPATH);
         screenshotAppState.setFileName("mlAutoVirt");
         screenshotAppState.setIsNumbered(true);
@@ -103,11 +170,11 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
-    hudText.setText("Speed: " + getInputAppState().getSpeed() +
-                " angle: " + getInputAppState().getAngle() +
-                " pos: (" + carNode.getLocalTranslation().x + ", " +
-                carNode.getLocalTranslation().y + ", " +
-                carNode.getLocalTranslation().z + ")");
+        hudText.setText("Speed: " + getInputAppState().getSpeed()
+                + " angle: " + getInputAppState().getAngle()
+                + " pos: (" + carNode.getLocalTranslation().x + ", "
+                + carNode.getLocalTranslation().y + ", "
+                + carNode.getLocalTranslation().z + ")");
     }
 
     private void createTerrain() {
