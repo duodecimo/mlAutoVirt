@@ -102,60 +102,7 @@ public class Main extends SimpleApplication {
         hudText.setText("ML AutoVirt");          // the text
         hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
         guiNode.attachChild(hudText);
-        screenshotAppState = new ScreenshotAppState() {
-            RenderManager localRM;
-            int localwidth;
-            int localheight;
-            ByteBuffer localoutBuf;
-
-            @Override
-            public void initialize(RenderManager rm, ViewPort vp) {
-                super.initialize(rm, vp);
-                renderer = rm.getRenderer();
-                localRM = rm;
-            }
-
-            @Override
-            public void reshape(ViewPort vp, int w, int h) {
-                super.reshape(vp, w, h);
-                localoutBuf = BufferUtils.createByteBuffer(w * h * 4);
-                localwidth = w;
-                localheight = h;
-            }
-
-            @Override
-            public void postFrame(FrameBuffer out) {
-                super.postFrame(out);
-                Camera curCamera = localRM.getCurrentCamera();
-                int viewX = (int) (curCamera.getViewPortLeft() * curCamera.getWidth());
-                int viewY = (int) (curCamera.getViewPortBottom() * curCamera.getHeight());
-                int viewWidth = (int) ((curCamera.getViewPortRight() - curCamera.getViewPortLeft()) * curCamera.getWidth());
-                int viewHeight = (int) ((curCamera.getViewPortTop() - curCamera.getViewPortBottom()) * curCamera.getHeight());
-
-                renderer.setViewPort(0, 0, localwidth, localheight);
-                renderer.readFrameBuffer(out, localoutBuf);
-                for (int i = 0; i < (localwidth * localheight * 4); i++) {
-                    try {
-                        if (temp == null) {
-                            //create a temp file
-                            temp = File.createTempFile("mlAutovirtImageBytes", ".tmp");
-                            bufferedWriter = new BufferedWriter(new FileWriter(temp));
-                            System.out.println("Temp file : " + temp.getAbsolutePath());
-                        }
-                        // write data header
-                        bufferedWriter.write(localoutBuf.get(i));
-                        if (i < (localwidth * localheight * 4) - 1) {
-                            bufferedWriter.write(" ");
-                        } else {
-                            bufferedWriter.write("\n");
-                        }
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                renderer.setViewPort(viewX, viewY, viewWidth, viewHeight);
-            }
-        };
+        screenshotAppState = new ScreenshotAppState();
         screenshotAppState.setFilePath(SCREENSHOTPATH);
         screenshotAppState.setFileName("mlAutoVirt");
         screenshotAppState.setIsNumbered(true);

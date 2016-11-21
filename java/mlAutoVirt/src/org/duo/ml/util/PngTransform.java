@@ -5,6 +5,7 @@
  */
 package org.duo.ml.util;
 
+import com.jme3.app.state.ScreenshotAppState;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -32,6 +33,7 @@ public class PngTransform {
     private int index = 0;
     private final int FINALWIDTH = 32;
     private final int FINALHEIGHT = 18;
+    private ScreenshotAppState screenshotAppState;
 
     public PngTransform() {
         try (Stream<Path> paths = Files.walk(Paths.get("/home/duo/Imagens/mlAutoVirt"))) {
@@ -55,6 +57,8 @@ public class PngTransform {
                         ImageIO.write(scaled, "png", baos);
                         baos.flush();
                         byte[] imageInByte = baos.toByteArray();
+                        System.out.println("Image in byte: " + imageInByte.length +
+                                " (32*18 = " + 32*18 + "");
                         // now save the bytes in Octave format to be processed with machine learning.
                         //imageInByte.length;
                     } catch (IOException ex) {
