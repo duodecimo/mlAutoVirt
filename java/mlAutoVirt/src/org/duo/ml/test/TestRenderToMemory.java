@@ -29,9 +29,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.color.ColorSpace;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.nio.ByteBuffer;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -64,6 +66,10 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
     private final byte[] cpuArray = new byte[width * height * 4];
     private final BufferedImage bufferedImage = new BufferedImage(width, height,
                                             BufferedImage.TYPE_4BYTE_ABGR);
+    private long millis = System.currentTimeMillis();
+    private final BufferedImage grayBufferedImage = new BufferedImage(width, height,
+                                            BufferedImage.TYPE_BYTE_GRAY);
+    private JFrame jFrame;
 
     private class ImageDisplay extends JPanel {
 
@@ -114,23 +120,22 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
     }
 
     public void createDisplayFrame(){
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                JFrame frame = new JFrame("Render Display");
-                imageDisplay = new ImageDisplay();
-                imageDisplay.setPreferredSize(new Dimension(width, height));
-                frame.getContentPane().add(imageDisplay);
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                frame.addWindowListener(new WindowAdapter(){
-                    public void windowClosed(WindowEvent e){
-                        stop();
-                    }
-                });
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setResizable(false);
-                frame.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Render Display");
+            imageDisplay = new ImageDisplay();
+            imageDisplay.setPreferredSize(new Dimension(width, height));
+            frame.getContentPane().add(imageDisplay);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.addWindowListener(new WindowAdapter(){
+                @Override
+                public void windowClosed(WindowEvent e){
+                    stop();
+                }
+            });
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setResizable(false);
+            frame.setVisible(true);
         });
     }
 
@@ -139,7 +144,19 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
         renderer.readFrameBuffer(frameBuffer, byteBuffer);
 
         synchronized (bufferedImage) {
-            Screenshots.convertScreenShot(byteBuffer, bufferedImage);    
+            Screenshots.convertScreenShot(byteBuffer, bufferedImage);
+            if(System.currentTimeMillis()-millis > 4000) {
+                millis = System.currentTimeMillis();
+                System.out.println("Converting to grayscale at " + (millis/1000));
+                //each 4 seconds
+                ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+                op.filter(bufferedImage, grayBufferedImage);
+                show("Gray scale: " + (millis/1000), grayBufferedImage, 4);
+                //WritableRaster raster = grayBufferedImage.getRaster();
+                //DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
+                //byte[] rawPixels = data.getData(); 
+                //System.out.println("BYTES---------- "+rawPixels.length+ Arrays.toString(rawPixels));
+            }
         }
 
         if (imageDisplay != null)
@@ -206,19 +223,24 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
         geometry.updateGeometricState();
     }
 
+    @Override
     public void initialize(RenderManager rm, ViewPort vp) {
     }
 
+    @Override
     public void reshape(ViewPort vp, int w, int h) {
     }
 
+    @Override
     public boolean isInitialized() {
         return true;
     }
 
+    @Override
     public void preFrame(float tpf) {
     }
 
+    @Override
     public void postQueue(RenderQueue rq) {
     }
 
@@ -226,12 +248,34 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
      * Update the CPU image's contents after the scene has
      * been rendered to the framebuffer.
      */
+    @Override
     public void postFrame(FrameBuffer out) {
         updateImageContents();
     }
 
+    @Override
     public void cleanup() {
     }
 
-
+    private void show(String title, final BufferedImage img, int i) {
+        SwingUtilities.invokeLater(() -> {
+            jFrame = new JFrame(title);
+            jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            jFrame.setContentPane(new JPanel() {
+                @Override
+                protected void paintChildren(Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.drawImage(img, null, 0, 0);
+                }
+                
+                @Override
+                public Dimension getPreferredSize() {
+                    return new Dimension(img.getWidth(), img.getHeight());
+                }
+            });
+            jFrame.pack();
+            jFrame.setLocation(50 + (i * 50), 50 + (i * 50));
+            jFrame.setVisible(true);
+        });
+    }
 }
