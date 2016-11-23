@@ -36,7 +36,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.awt.image.DataBufferByte;
+import java.awt.image.WritableRaster;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -74,6 +82,7 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
     private final BufferedImage grayBufferedImage = new BufferedImage(width/4, height/4,
                                             BufferedImage.TYPE_BYTE_GRAY);
     private JFrame jFrame;
+    private final String SCREENSHOTFILEPATH = "/home/duo/Imagens/mlAutoVirt/captured.txt";
 
     private class ImageDisplay extends JPanel {
 
@@ -150,23 +159,39 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
         synchronized (bufferedImage) {
             Screenshots.convertScreenShot(byteBuffer, bufferedImage);
             if(System.currentTimeMillis()-millis > 4000) {
-                millis = System.currentTimeMillis();
-                System.out.println("Converting to grayscale at " + (millis/1000));
-                //each 4 seconds
-                ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-                op.filter(bufferedImage, bigGrayBufferedImage);
-
-                AffineTransform affineTransform = new AffineTransform();
-                affineTransform.scale(0.25, 0.25);
-                AffineTransformOp scaleOp = 
-                    new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
-                scaleOp.filter(bigGrayBufferedImage, grayBufferedImage);
-                
-                show("Gray scale: " + (millis/1000), grayBufferedImage, 4);
-                //WritableRaster raster = grayBufferedImage.getRaster();
-                //DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
-                //byte[] rawPixels = data.getData(); 
-                //System.out.println("BYTES---------- "+rawPixels.length+ Arrays.toString(rawPixels));
+                OutputStream out = null;
+                try {
+                    millis = System.currentTimeMillis();
+                    System.out.println("Converting to grayscale at " + (millis/1000));
+                    //each 4 seconds
+                    ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+                    op.filter(bufferedImage, bigGrayBufferedImage);
+                    AffineTransform affineTransform = new AffineTransform();
+                    affineTransform.scale(0.25, 0.25);
+                    AffineTransformOp scaleOp =
+                            new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+                    scaleOp.filter(bigGrayBufferedImage, grayBufferedImage);
+                    show("Gray scale: " + (millis/1000), grayBufferedImage, 4);
+                    WritableRaster raster = grayBufferedImage.getRaster();
+                    DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
+                    byte[] rawPixels = data.getData();
+                    out = new FileOutputStream(SCREENSHOTFILEPATH, true);
+                    for(int i=0; i< rawPixels.length; i++) {
+                        out.write((int) rawPixels[i] & 0xFF);
+                    }
+                    //out.write(rawPixels, 0, rawPixels.length);
+                    out.write(10);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(TestRenderToMemory.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(TestRenderToMemory.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(TestRenderToMemory.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
 
