@@ -32,6 +32,8 @@ import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.nio.ByteBuffer;
@@ -63,11 +65,13 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
     private static final int width = 800, height = 600;
 
     private final ByteBuffer byteBuffer = BufferUtils.createByteBuffer(width * height * 4);
-    private final byte[] cpuArray = new byte[width * height * 4];
+    //private final byte[] cpuArray = new byte[width * height * 4];
     private final BufferedImage bufferedImage = new BufferedImage(width, height,
                                             BufferedImage.TYPE_4BYTE_ABGR);
     private long millis = System.currentTimeMillis();
-    private final BufferedImage grayBufferedImage = new BufferedImage(width, height,
+    private final BufferedImage bigGrayBufferedImage = new BufferedImage(width, height,
+                                            BufferedImage.TYPE_BYTE_GRAY);
+    private final BufferedImage grayBufferedImage = new BufferedImage(width/4, height/4,
                                             BufferedImage.TYPE_BYTE_GRAY);
     private JFrame jFrame;
 
@@ -150,7 +154,14 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
                 System.out.println("Converting to grayscale at " + (millis/1000));
                 //each 4 seconds
                 ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-                op.filter(bufferedImage, grayBufferedImage);
+                op.filter(bufferedImage, bigGrayBufferedImage);
+
+                AffineTransform affineTransform = new AffineTransform();
+                affineTransform.scale(0.25, 0.25);
+                AffineTransformOp scaleOp = 
+                    new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+                scaleOp.filter(bigGrayBufferedImage, grayBufferedImage);
+                
                 show("Gray scale: " + (millis/1000), grayBufferedImage, 4);
                 //WritableRaster raster = grayBufferedImage.getRaster();
                 //DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
