@@ -21,22 +21,23 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.duo.ml.test.TestRenderToMemory;
 
 /**
  *
  * @author duo
  */
-public class ScreenCaptureAppState 
-        extends AbstractAppState 
+public class ScreenCaptureAppState
+        extends AbstractAppState
         implements SceneProcessor {
+
     private Renderer renderer;
     private int width;
     private int height;
@@ -48,8 +49,8 @@ public class ScreenCaptureAppState
     private BufferedImage bigGrayBufferedImage;
     // scaled gray shades
     private BufferedImage grayBufferedImage;
-    private final String SCREENSHOTFILEPATH = 
-            "/home/duo/Imagens/mlAutoVirt/captured.txt";
+    private File file;
+    private float scaleFactor;
 
     @Override
     public void initialize(RenderManager rm, ViewPort vp) {
@@ -58,17 +59,29 @@ public class ScreenCaptureAppState
         millis = System.currentTimeMillis();
         width = vp.getCamera().getWidth();
         height = vp.getCamera().getHeight();
+        scaleFactor = 0.025F;
         byteBuffer = BufferUtils.createByteBuffer(width * height * 4);
         // original image
         bufferedImage = new BufferedImage(width, height,
-                                            BufferedImage.TYPE_4BYTE_ABGR);
+                BufferedImage.TYPE_4BYTE_ABGR);
         // store gray shades
         bigGrayBufferedImage = new BufferedImage(width, height,
-                                            BufferedImage.TYPE_BYTE_GRAY);
+                BufferedImage.TYPE_BYTE_GRAY);
         // scaled gray shades
-        grayBufferedImage = new BufferedImage(width/4, height/4,
-                                            BufferedImage.TYPE_BYTE_GRAY);
+        grayBufferedImage = new BufferedImage((int)(width * scaleFactor), (int)(height * scaleFactor),
+                BufferedImage.TYPE_BYTE_GRAY);
         vp.addProcessor(this);
+        System.out.println("original width = " + width
+                + " height = " + height);
+        try {
+            file = File.createTempFile("mlAutoVirt", "txt");
+            System.out.println("Temporary file: "
+                    + file.getAbsoluteFile().toString()
+                    + "(" + (width * scaleFactor)
+                    + "x" + (height * scaleFactor) + ")");
+        } catch (IOException ex) {
+            Logger.getLogger(ScreenCaptureAppState.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -86,58 +99,38 @@ public class ScreenCaptureAppState
 
     @Override
     public void postFrame(FrameBuffer out) {
-        //System.out.println("ScreenCaptureAppState postFrame called!");
         byteBuffer.clear();
         renderer.readFrameBuffer(out, byteBuffer);
-
         synchronized (bufferedImage) {
             Screenshots.convertScreenShot(byteBuffer, bufferedImage);
-            if(System.currentTimeMillis()-millis > 4000) {
-                OutputStream outputStream = null;
-                try {
-                    millis = System.currentTimeMillis();
-                    System.out.println("Converting to grayscale at " + (millis/1000));
-                    //each 4 seconds
-                    ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-                    op.filter(bufferedImage, bigGrayBufferedImage);
-                    AffineTransform affineTransform = new AffineTransform();
-                    affineTransform.scale(0.25, 0.25);
-                    AffineTransformOp scaleOp =
-                            new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
-                    scaleOp.filter(bigGrayBufferedImage, grayBufferedImage);
-                    //show("Gray scale: " + (millis/1000), grayBufferedImage, 4);
-                    WritableRaster raster = grayBufferedImage.getRaster();
-                    DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
-                    byte[] rawPixels = data.getData();
-                    int b;
-                    StringBuilder sb = new StringBuilder();
-                    for(int k=0; k<rawPixels.length; k++) {
-                        b = rawPixels[k] & 0xFF;
-                        sb.append(b);
-                        if(k<rawPixels.length-1) {
-                            sb.append(" ");
-                        } else {
-                            sb.append("\n");
-                        }
+            if (System.currentTimeMillis() - millis > 2000) {
+                millis = System.currentTimeMillis();
+                //each 2 seconds
+                ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+                op.filter(bufferedImage, bigGrayBufferedImage);
+                AffineTransform affineTransform = new AffineTransform();
+                affineTransform.scale(scaleFactor, scaleFactor);
+                AffineTransformOp scaleOp
+                        = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+                scaleOp.filter(bigGrayBufferedImage, grayBufferedImage);
+                WritableRaster raster = grayBufferedImage.getRaster();
+                DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
+                byte[] rawPixels = data.getData();
+                int b;
+                StringBuilder sb = new StringBuilder();
+                for (int k = 0; k < rawPixels.length; k++) {
+                    b = rawPixels[k] & 0xFF;
+                    sb.append(b);
+                    if (k < rawPixels.length - 1) {
+                        sb.append(" ");
+                    } else {
+                        sb.append("\n");
                     }
-                    System.out.println("bytes: (" +
-                            + rawPixels.length + ") " +
-                            sb.substring(22000, 22500));
-                    outputStream = new FileOutputStream(SCREENSHOTFILEPATH, true);
-                    
-                    //for(int i=0; i< rawPixels.length; i++) {
-                    //    out.write((int) rawPixels[i] & 0xFF);
-                    //}
-                    //out.write(rawPixels, 0, rawPixels.length);
-                    //out.write(10);
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(TestRenderToMemory.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    try {
-                        outputStream.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(TestRenderToMemory.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                }
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    writer.append(sb);
+                } catch (IOException ex) {
+                    Logger.getLogger(ScreenCaptureAppState.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
