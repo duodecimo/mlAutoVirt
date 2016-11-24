@@ -73,7 +73,6 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
     private static final int width = 800, height = 600;
 
     private final ByteBuffer byteBuffer = BufferUtils.createByteBuffer(width * height * 4);
-    //private final byte[] cpuArray = new byte[width * height * 4];
     private final BufferedImage bufferedImage = new BufferedImage(width, height,
                                             BufferedImage.TYPE_4BYTE_ABGR);
     private long millis = System.currentTimeMillis();

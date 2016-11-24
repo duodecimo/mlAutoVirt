@@ -101,8 +101,8 @@ public class InputAppState
     public void onAction(String name, boolean isPressed, float tpf) {
         if(name.equals(InputMapping.Print.name())){
             if(isPressed) {
-                ((Main) app).getScreenshotAppState().takeScreenshot();
-                System.out.println("Screenshot taken!");
+                //((Main) app).getScreenshotAppState().takeScreenshot();
+                //System.out.println("Screenshot taken!");
             }
         }
     }

@@ -9,9 +9,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.ViewPort;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -19,17 +16,10 @@ import com.jme3.scene.control.CameraControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
-import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Texture;
-import com.jme3.util.BufferUtils;
 import com.jme3.util.SkyFactory;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * test
@@ -44,6 +34,7 @@ public class Main extends SimpleApplication {
     private float carSpeed;
     private InputAppState inputAppState;
     private ScreenshotAppState screenshotAppState;
+    private ScreenCaptureAppState screenCaptureAppState;
     public long shtIndex = 0L;
     private final String SCREENSHOTPATH = "/home/duo/Imagens/mlAutoVirt/";
     private File temp;
@@ -72,6 +63,8 @@ public class Main extends SimpleApplication {
         rootNode.addLight(new AmbientLight());
         inputAppState = new InputAppState();
         stateManager.attach(inputAppState);
+        screenCaptureAppState = new ScreenCaptureAppState();
+        stateManager.attach(screenCaptureAppState);
         car = assetManager.loadModel("Models/Carroblend01.j3o");
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
         car.setMaterial(mat);
@@ -102,12 +95,13 @@ public class Main extends SimpleApplication {
         hudText.setText("ML AutoVirt");          // the text
         hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
         guiNode.attachChild(hudText);
-        screenshotAppState = new ScreenshotAppState();
-        screenshotAppState.setFilePath(SCREENSHOTPATH);
-        screenshotAppState.setFileName("mlAutoVirt");
-        screenshotAppState.setIsNumbered(true);
-        screenshotAppState.setShotIndex(shtIndex);
-        this.stateManager.attach(screenshotAppState);
+        screenCaptureAppState.initialize(renderManager, viewPort);
+        //screenshotAppState = new ScreenshotAppState();
+        //screenshotAppState.setFilePath(SCREENSHOTPATH);
+        //screenshotAppState.setFileName("mlAutoVirt");
+        //screenshotAppState.setIsNumbered(true);
+        //screenshotAppState.setShotIndex(shtIndex);
+        //this.stateManager.attach(screenshotAppState);
     }
 
     public ScreenshotAppState getScreenshotAppState() {
