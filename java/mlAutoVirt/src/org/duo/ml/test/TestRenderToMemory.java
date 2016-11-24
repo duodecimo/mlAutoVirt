@@ -175,12 +175,25 @@ public class TestRenderToMemory extends SimpleApplication implements SceneProces
                     WritableRaster raster = grayBufferedImage.getRaster();
                     DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
                     byte[] rawPixels = data.getData();
-                    out = new FileOutputStream(SCREENSHOTFILEPATH, true);
-                    for(int i=0; i< rawPixels.length; i++) {
-                        out.write((int) rawPixels[i] & 0xFF);
+                    int b;
+                    StringBuilder sb = new StringBuilder();
+                    for(int k=0; k<rawPixels.length; k++) {
+                        b = rawPixels[k] & 0xFF;
+                        sb.append(b);
+                        if(k<rawPixels.length-1) {
+                            sb.append(" ");
+                        } else {
+                            sb.append("\n");
+                        }
                     }
+                    System.out.println("bytes: " + sb.substring(15000, 15200));
+                    out = new FileOutputStream(SCREENSHOTFILEPATH, true);
+                    
+                    //for(int i=0; i< rawPixels.length; i++) {
+                    //    out.write((int) rawPixels[i] & 0xFF);
+                    //}
                     //out.write(rawPixels, 0, rawPixels.length);
-                    out.write(10);
+                    //out.write(10);
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(TestRenderToMemory.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
