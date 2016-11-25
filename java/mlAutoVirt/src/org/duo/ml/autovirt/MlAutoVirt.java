@@ -18,27 +18,25 @@ import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
-import java.io.BufferedWriter;
-import java.io.File;
 
 /**
  * test
  *
  * @author normenhansen
  */
-public class Main extends SimpleApplication {
+public class MlAutoVirt extends SimpleApplication {
+
+    public static enum DirectionEnum {LEFTMOST, LEFTMID, LEFTMIN, CENTER, RIGHTMIN, RIGHTMID, RIGHTMOST};
 
     private Node carNode;
     private Spatial car;
     private CameraNode cameraNode;
     private float carSpeed;
+    private DirectionEnum directionEnum;
     private InputAppState inputAppState;
     private ScreenshotAppState screenshotAppState;
     private ScreenCaptureAppState screenCaptureAppState;
     public long shtIndex = 0L;
-    private final String SCREENSHOTPATH = "/home/duo/Imagens/mlAutoVirt/";
-    private File temp;
-    private BufferedWriter bufferedWriter;
 
     private TerrainQuad terrainQuad;
     //terrain common
@@ -47,13 +45,14 @@ public class Main extends SimpleApplication {
     private Material matRock;
     private Material matBullet;
     private BitmapText hudText;
+    private String direction;
 
-    public Main() {
+    public MlAutoVirt() {
         super(new ConfigAppState());
     }
 
     public static void main(String[] args) {
-        Main app = new Main();
+        MlAutoVirt app = new MlAutoVirt();
         app.start();
     }
 
@@ -96,12 +95,6 @@ public class Main extends SimpleApplication {
         hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
         guiNode.attachChild(hudText);
         screenCaptureAppState.initialize(renderManager, viewPort);
-        //screenshotAppState = new ScreenshotAppState();
-        //screenshotAppState.setFilePath(SCREENSHOTPATH);
-        //screenshotAppState.setFileName("mlAutoVirt");
-        //screenshotAppState.setIsNumbered(true);
-        //screenshotAppState.setShotIndex(shtIndex);
-        //this.stateManager.attach(screenshotAppState);
     }
 
     public ScreenshotAppState getScreenshotAppState() {
@@ -111,8 +104,22 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
+        direction = "...|...";
+        if(directionEnum == DirectionEnum.RIGHTMOST) {
+            direction = "...|>>>";
+        } else if(directionEnum == DirectionEnum.RIGHTMID) {
+            direction = "...|>>.";
+        } else if(directionEnum == DirectionEnum.RIGHTMIN) {
+            direction = "...|>..";
+        } else if(directionEnum == DirectionEnum.LEFTMIN) {
+            direction = "..<|...";
+        } else if(directionEnum == DirectionEnum.LEFTMID) {
+            direction = ".<<|...";
+        } else if(directionEnum == DirectionEnum.LEFTMOST) {
+            direction = "<<<|...";
+        }
         hudText.setText("Speed: " + getInputAppState().getSpeed()
-                + " angle: " + getInputAppState().getAngle()
+                + " angle: " + direction
                 + " pos: (" + carNode.getLocalTranslation().x + ", "
                 + carNode.getLocalTranslation().y + ", "
                 + carNode.getLocalTranslation().z + ")");
@@ -151,22 +158,21 @@ public class Main extends SimpleApplication {
         matRock.setTexture("NormalMap_1", normalMap2);
         matRock.setTexture("NormalMap_2", normalMap2);
 
-        AbstractHeightMap heightmap = null;
         try {
-            heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 0.02f);
+            AbstractHeightMap heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 0.02f);
             heightmap.load();
+            terrainQuad = new TerrainQuad("terrain", 65, 513, heightmap.getHeightMap());
+            terrainQuad.setMaterial(matRock);
+            terrainQuad.setLocalScale(new Vector3f(2, 2, 2));
+            terrainQuad.setLocalTranslation(-100, -40, 150);
+            terrain = new Node();
+            terrain.attachChild(terrainQuad);
+
+            rootNode.attachChild(terrain);
 
         } catch (Exception e) {
         }
 
-        terrainQuad = new TerrainQuad("terrain", 65, 513, heightmap.getHeightMap());
-        terrainQuad.setMaterial(matRock);
-        terrainQuad.setLocalScale(new Vector3f(2, 2, 2));
-        terrainQuad.setLocalTranslation(-100, -40, 150);
-        terrain = new Node();
-        terrain.attachChild(terrainQuad);
-
-        rootNode.attachChild(terrain);
     }
 
     public CameraNode getCameraNode() {
@@ -188,4 +194,13 @@ public class Main extends SimpleApplication {
     public Node getCarNode() {
         return carNode;
     }
+
+    public DirectionEnum getDirectionEnum() {
+        return directionEnum;
+    }
+
+    public void setDirectionEnum(DirectionEnum directionEnum) {
+        this.directionEnum = directionEnum;
+    }
+
 }

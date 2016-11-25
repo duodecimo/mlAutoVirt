@@ -21,14 +21,14 @@ import com.jme3.input.controls.KeyTrigger;
 public class InputAppState 
     extends AbstractAppState 
     implements ActionListener, AnalogListener {
-    private Application app;
+    private MlAutoVirt app;
     private InputManager inputManager;
     private float speed;
     private float angle;
-    private final float MAXSPEED = 80.0f;
-    private final float INCSPEED = 1.0f;
-    private final float MAXANGLE = 5.0f;
-    private final float INCANGLE = 0.005f;
+    private final float MAXSPEED = 6.0f;
+    private final float INCSPEED = 2.0f;
+    private final float MAXANGLE = 0.09f;
+    private final float INCANGLE = 0.03f;
     
     public enum InputMapping {
         RotateLeft, RotateRight, MoveFoward, MoveBackward, Print;
@@ -57,52 +57,60 @@ public class InputAppState
         addInputMappings();
         speed = 0.0f;
         angle = 0.0f;
-        this.app = app;
+        this.app = (MlAutoVirt) app;
     }
     
     @Override
     public void onAnalog(String name, float value, float tpf) {
-        if (name.equals(InputMapping.MoveFoward.name())) {
-            speed += INCSPEED;
-            // set max speed
-            if (speed > MAXSPEED) {
-                speed = MAXSPEED;
-            }
-        } else if (name.equals(InputMapping.MoveBackward.name())) {
-            speed -= INCSPEED;
-            // no back moving
-            if (speed < 0.0f) {
-                speed = 0.0f;
-            }
-        } else if (name.equals(InputMapping.RotateLeft.name())) {
-            angle += INCANGLE;
-        } else if (name.equals(InputMapping.RotateRight.name())) {
-            angle -= INCANGLE;
-        }
-        // when close to straight, make direction straight
-        if (angle <= 0.0f && angle > -0.003f) {
-            angle = 0.0f;
-        }
-        // max positive angle
-        if (angle > MAXANGLE) {
-            angle = MAXANGLE;
-        }
-        // when close to straight, make direction straight
-        if (angle >= 0.0f && angle < 0.003f) {
-            angle = 0.0f;
-        }
-        // max negative angle
-        if (angle < -MAXANGLE) {
-            angle = -MAXANGLE;
-        }
     }
 
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
-        if(name.equals(InputMapping.Print.name())){
-            if(isPressed) {
+        if (isPressed) {
+            if (name.equals(InputMapping.MoveFoward.name())) {
+                speed += INCSPEED;
+                // set max speed
+                if (speed > MAXSPEED) {
+                    speed = MAXSPEED;
+                }
+            } else if (name.equals(InputMapping.MoveBackward.name())) {
+                speed -= INCSPEED;
+                // no back moving
+                if (speed < 0.0f) {
+                    speed = 0.0f;
+                }
+            }
+            if (name.equals(InputMapping.RotateLeft.name())) {
+                angle += INCANGLE;
+                if (angle > MAXANGLE) {
+                    angle = MAXANGLE;
+                }
+            } else if (name.equals(InputMapping.RotateRight.name())) {
+                angle -= INCANGLE;
+                if (angle < -MAXANGLE) {
+                    angle = -MAXANGLE;
+                }
+            }
+            if (angle == 0.09f) {
+                app.setDirectionEnum(MlAutoVirt.DirectionEnum.LEFTMOST);
+            } else if (angle == 0.06f) {
+                app.setDirectionEnum(MlAutoVirt.DirectionEnum.LEFTMID);
+            } else if (angle == 0.03f) {
+                app.setDirectionEnum(MlAutoVirt.DirectionEnum.LEFTMIN);
+            } else if (angle == 0.0f) {
+                app.setDirectionEnum(MlAutoVirt.DirectionEnum.CENTER);
+            } else if (angle == -0.03f) {
+                app.setDirectionEnum(MlAutoVirt.DirectionEnum.RIGHTMIN);
+            } else if (angle == -0.06f) {
+                app.setDirectionEnum(MlAutoVirt.DirectionEnum.RIGHTMID);
+            } else if (angle == -0.09f) {
+                app.setDirectionEnum(MlAutoVirt.DirectionEnum.RIGHTMOST);
+            }
+            if (name.equals(InputMapping.Print.name())) {
+                if (isPressed) {
                 //((Main) app).getScreenshotAppState().takeScreenshot();
-                //System.out.println("Screenshot taken!");
+                    //System.out.println("Screenshot taken!");
+                }
             }
         }
     }

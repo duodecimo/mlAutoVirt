@@ -5,7 +5,6 @@
  */
 package org.duo.ml.autovirt;
 
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -16,10 +15,10 @@ import com.jme3.scene.control.AbstractControl;
  * @author duo
  */
 public class MovementControl extends AbstractControl {
-    Main app;
+    MlAutoVirt app;
     Vector3f direction;
 
-    public MovementControl(Main app) {
+    public MovementControl(MlAutoVirt app) {
         this.app = app;
     }
 
