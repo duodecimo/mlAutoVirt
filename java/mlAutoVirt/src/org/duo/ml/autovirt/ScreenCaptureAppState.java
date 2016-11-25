@@ -39,8 +39,10 @@ public class ScreenCaptureAppState
         implements SceneProcessor {
 
     private Renderer renderer;
-    private int width;
-    private int height;
+    private int widthOriginal;
+    private int heightOriginal;
+    private int widthScaled;
+    private int heightScaled;
     private long millis;
     private ByteBuffer byteBuffer;
     // original image
@@ -61,25 +63,35 @@ public class ScreenCaptureAppState
         System.out.println("ScreenCaptureAppState initialized!");
         this.renderer = rm.getRenderer();
         millis = System.currentTimeMillis();
-        width = vp.getCamera().getWidth();
-        height = vp.getCamera().getHeight();
+        widthOriginal = vp.getCamera().getWidth();
+        heightOriginal = vp.getCamera().getHeight();
         scaleFactor = 0.025F;
-        byteBuffer = BufferUtils.createByteBuffer(width * height * 4);
+        widthScaled = ((int) (widthOriginal * scaleFactor));
+        heightScaled = ((int) (heightOriginal * scaleFactor));
+        byteBuffer = BufferUtils.createByteBuffer(widthOriginal *
+                heightOriginal * 4);
         // original image
-        bufferedImage = new BufferedImage(width, height,
+        bufferedImage = new BufferedImage(widthOriginal, 
+                heightOriginal,
                 BufferedImage.TYPE_4BYTE_ABGR);
         // store gray shades
-        bigGrayBufferedImage = new BufferedImage(width, height,
+        bigGrayBufferedImage = new BufferedImage(widthOriginal, 
+                heightOriginal,
                 BufferedImage.TYPE_BYTE_GRAY);
         // scaled gray shades
-        grayBufferedImage = new BufferedImage((int)(width * scaleFactor), (int)(height * scaleFactor),
+        grayBufferedImage = new BufferedImage(widthScaled,
+                heightScaled,
                 BufferedImage.TYPE_BYTE_GRAY);
         dataLinesCount = 0;
         stringBuilderBytes = new StringBuilder();
         vp.addProcessor(this);
         initialized = true;
-        System.out.println("original width = " + width
-                + " height = " + height);
+        System.out.println("original width = " + widthOriginal +
+                " height = " + heightOriginal +
+                " total = " + widthOriginal * heightOriginal +
+                " scaled width = " + widthScaled +
+                " height = " + heightScaled +
+                " total = " + widthScaled * heightScaled);
     }
 
     @Override
@@ -104,15 +116,18 @@ public class ScreenCaptureAppState
             if (System.currentTimeMillis() - millis > 2000) {
                 millis = System.currentTimeMillis();
                 //each 2 seconds
-                ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+                ColorConvertOp op = 
+                        new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
                 op.filter(bufferedImage, bigGrayBufferedImage);
-                AffineTransform affineTransform = new AffineTransform();
+                AffineTransform affineTransform = 
+                        new AffineTransform();
                 affineTransform.scale(scaleFactor, scaleFactor);
                 AffineTransformOp scaleOp
                         = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
                 scaleOp.filter(bigGrayBufferedImage, grayBufferedImage);
                 WritableRaster raster = grayBufferedImage.getRaster();
-                DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
+                DataBufferByte data = 
+                        (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
                 dataColumnsCount = rawPixels.length;
                 dataLinesCount++;
@@ -136,8 +151,8 @@ public class ScreenCaptureAppState
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             System.out.println("Temporary file: "
                     + file.getAbsoluteFile().toString()
-                    + "(" + (width * scaleFactor)
-                    + "x" + (height * scaleFactor) + ")");
+                    + "(" + widthScaled
+                    + "x" + heightScaled + ")");
 
             StringBuilder stringBuilderHeader = new StringBuilder();
             stringBuilderHeader.append("# name: x\n");
