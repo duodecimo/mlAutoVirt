@@ -49,6 +49,10 @@ public class ScreenCaptureAppState
     private BufferedImage bigGrayBufferedImage;
     // scaled gray shades
     private BufferedImage grayBufferedImage;
+    // stringBuilder to store all bytes in Octave format
+    private StringBuilder stringBuilderBytes;
+    private int dataLinesCount;
+    private int dataColumnsCount;
     private File file;
     private float scaleFactor;
 
@@ -70,18 +74,12 @@ public class ScreenCaptureAppState
         // scaled gray shades
         grayBufferedImage = new BufferedImage((int)(width * scaleFactor), (int)(height * scaleFactor),
                 BufferedImage.TYPE_BYTE_GRAY);
+        dataLinesCount = 0;
+        stringBuilderBytes = new StringBuilder();
         vp.addProcessor(this);
+        initialized = true;
         System.out.println("original width = " + width
                 + " height = " + height);
-        try {
-            file = File.createTempFile("mlAutoVirt", "txt");
-            System.out.println("Temporary file: "
-                    + file.getAbsoluteFile().toString()
-                    + "(" + (width * scaleFactor)
-                    + "x" + (height * scaleFactor) + ")");
-        } catch (IOException ex) {
-            Logger.getLogger(ScreenCaptureAppState.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @Override
@@ -116,28 +114,51 @@ public class ScreenCaptureAppState
                 WritableRaster raster = grayBufferedImage.getRaster();
                 DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
+                dataColumnsCount = rawPixels.length;
+                dataLinesCount++;
                 int b;
-                StringBuilder sb = new StringBuilder();
                 for (int k = 0; k < rawPixels.length; k++) {
                     b = rawPixels[k] & 0xFF;
-                    sb.append(b);
+                    stringBuilderBytes.append(b);
                     if (k < rawPixels.length - 1) {
-                        sb.append(" ");
+                        stringBuilderBytes.append(" ");
                     } else {
-                        sb.append("\n");
+                        stringBuilderBytes.append("\n");
                     }
-                }
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                    writer.append(sb);
-                } catch (IOException ex) {
-                    Logger.getLogger(ScreenCaptureAppState.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
     }
 
+    private void writeToFile() {
+        try {
+            file = File.createTempFile("mlAutoVirt", ".txt");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            System.out.println("Temporary file: "
+                    + file.getAbsoluteFile().toString()
+                    + "(" + (width * scaleFactor)
+                    + "x" + (height * scaleFactor) + ")");
+
+            StringBuilder stringBuilderHeader = new StringBuilder();
+            stringBuilderHeader.append("# name: x\n");
+            stringBuilderHeader.append("# type: matrix\n");
+            stringBuilderHeader.append("# rows: "
+                    + dataLinesCount + "\n");
+            stringBuilderHeader.append("# columns: "
+                    + dataColumnsCount + "\n");
+            writer.append(stringBuilderHeader);
+            writer.append(stringBuilderBytes);
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ScreenCaptureAppState.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+    }
+
     @Override
     public void cleanup() {
+        writeToFile();
         super.cleanup();
+        initialized = false;
     }
 }
