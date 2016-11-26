@@ -18,6 +18,7 @@ import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
+import org.duo.ml.util.MlAutoVirtState;
 
 /**
  * test
@@ -186,6 +187,10 @@ public class MlAutoVirt extends SimpleApplication {
 
     public void setResult(int result) {
         this.result = result;
+    }
+
+    public void setState(MlAutoVirtState state) {
+        this.screenCaptureAppState.setState(state);
     }
 
 }

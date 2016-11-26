@@ -13,6 +13,7 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
+import org.duo.ml.util.MlAutoVirtState;
 
 /**
  *
@@ -33,7 +34,8 @@ public class InputAppState
     private float[] angleValues;
     
     public enum InputMapping {
-        RotateLeft, RotateRight, MoveFoward, MoveBackward, Print;
+        RotateLeft, RotateRight, MoveFoward, MoveBackward, 
+        Print, Idle, Learning, AutoDriving;
     }
 
     private void addInputMappings() {
@@ -47,6 +49,12 @@ public class InputAppState
                 new KeyTrigger(KeyInput.KEY_DOWN));
         inputManager.addMapping(InputMapping.Print.name(),
                 new KeyTrigger(KeyInput.KEY_P));
+        inputManager.addMapping(InputMapping.Idle.name(),
+                new KeyTrigger(KeyInput.KEY_I));
+        inputManager.addMapping(InputMapping.Learning.name(),
+                new KeyTrigger(KeyInput.KEY_L));
+        inputManager.addMapping(InputMapping.AutoDriving.name(),
+                new KeyTrigger(KeyInput.KEY_A));
         for(InputMapping i : InputMapping.values()) {
             inputManager.addListener(this, i.name());
         }
@@ -108,6 +116,12 @@ public class InputAppState
                 //((Main) app).getScreenshotAppState().takeScreenshot();
                     //System.out.println("Screenshot taken!");
                 }
+            } else if (name.equals(InputMapping.Idle.name())) {
+                app.setState(MlAutoVirtState.IDLE);
+            } else if (name.equals(InputMapping.Learning.name())) {
+                app.setState(MlAutoVirtState.LEARNING);
+            } else if (name.equals(InputMapping.AutoDriving.name())) {
+                app.setState(MlAutoVirtState.AUTODRIVING);
             }
         }
     }

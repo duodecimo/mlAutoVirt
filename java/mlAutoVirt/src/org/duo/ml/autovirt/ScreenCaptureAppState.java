@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.duo.ml.util.MlAutoVirtState;
 
 /**
  *
@@ -37,6 +38,7 @@ public class ScreenCaptureAppState
         extends AbstractAppState
         implements SceneProcessor {
 
+    private MlAutoVirtState state;
     private Renderer renderer;
     private int widthOriginal;
     private int heightOriginal;
@@ -87,6 +89,8 @@ public class ScreenCaptureAppState
         stringBuilderBytes = new StringBuilder();
         stringBuilderResults = new StringBuilder();
         vp.addProcessor(this);
+        // initial state
+        state = MlAutoVirtState.IDLE;
         initialized = true;
         System.out.println("original width = " + widthOriginal +
                 " height = " + heightOriginal +
@@ -132,56 +136,60 @@ public class ScreenCaptureAppState
                 DataBufferByte data = 
                         (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
-                dataColumnsCount = rawPixels.length;
-                dataLinesCount++;
-                int b;
-                for (int k = 0; k < rawPixels.length; k++) {
-                    b = rawPixels[k] & 0xFF;
-                    stringBuilderBytes.append(b);
-                    if (k < rawPixels.length - 1) {
-                        stringBuilderBytes.append(" ");
-                    } else {
-                        stringBuilderBytes.append("\n");
+                if (state == MlAutoVirtState.LEARNING) {
+                    dataColumnsCount = rawPixels.length;
+                    dataLinesCount++;
+                    int b;
+                    for (int k = 0; k < rawPixels.length; k++) {
+                        b = rawPixels[k] & 0xFF;
+                        stringBuilderBytes.append(b);
+                        if (k < rawPixels.length - 1) {
+                            stringBuilderBytes.append(" ");
+                        } else {
+                            stringBuilderBytes.append("\n");
+                        }
                     }
+                    stringBuilderResults.append(result).append("\n");
                 }
-                stringBuilderResults.append(result).append("\n");
             }
         }
     }
 
     private void writeToFile() {
-        try {
-            fileX = File.createTempFile("mlAutoVirtX", ".txt");
-            BufferedWriter writerY;
-            StringBuilder stringBuilderHeader;
-            try (BufferedWriter writerX = new BufferedWriter(new FileWriter(fileX))) {
-                fileY = File.createTempFile("mlAutoVirtY", ".txt");
-                writerY = new BufferedWriter(new FileWriter(fileY));
-                System.out.println("Temporary files: "
-                        + fileX.getAbsoluteFile().toString()
-                        + "(" + widthScaled
-                        + "x" + heightScaled + ") and " +
-                        fileY.getAbsoluteFile().toString());
+        if (dataLinesCount > 0) {
+            try {
+                fileX = File.createTempFile("mlAutoVirtX", ".txt");
+                BufferedWriter writerY;
+                StringBuilder stringBuilderHeader;
+                try (BufferedWriter writerX = new BufferedWriter(new FileWriter(fileX))) {
+                    fileY = File.createTempFile("mlAutoVirtY", ".txt");
+                    writerY = new BufferedWriter(new FileWriter(fileY));
+                    System.out.println("Temporary files: "
+                            + fileX.getAbsoluteFile().toString()
+                            + "(" + widthScaled
+                            + "x" + heightScaled + ") and "
+                            + fileY.getAbsoluteFile().toString());
+                    stringBuilderHeader = new StringBuilder();
+                    stringBuilderHeader.append("# name: x\n");
+                    stringBuilderHeader.append("# type: matrix\n");
+                    stringBuilderHeader.append("# rows: ").
+                            append(dataLinesCount).append("\n");
+                    writerX.append(stringBuilderHeader);
+                    writerX.append(stringBuilderBytes);
+                }
                 stringBuilderHeader = new StringBuilder();
-                stringBuilderHeader.append("# name: x\n");
+                stringBuilderHeader.append("# name: y\n");
                 stringBuilderHeader.append("# type: matrix\n");
                 stringBuilderHeader.append("# rows: ").
                         append(dataLinesCount).append("\n");
-                writerX.append(stringBuilderHeader);
-                writerX.append(stringBuilderBytes);
+                stringBuilderHeader.append("# columns: 1\n");
+                writerY.append(stringBuilderHeader);
+                writerY.append(stringBuilderResults);
+                writerY.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ScreenCaptureAppState.class.getName()).
+                        log(Level.SEVERE, null, ex);
             }
-            stringBuilderHeader = new StringBuilder();
-            stringBuilderHeader.append("# name: y\n");
-            stringBuilderHeader.append("# type: matrix\n");
-            stringBuilderHeader.append("# rows: ").
-                    append(dataLinesCount).append("\n");
-            stringBuilderHeader.append("# columns: 1\n");
-            writerY.append(stringBuilderHeader);
-            writerY.append(stringBuilderResults);
-            writerY.close();
-        } catch (IOException ex) {
-            Logger.getLogger(ScreenCaptureAppState.class.getName()).
-                    log(Level.SEVERE, null, ex);
         }
     }
 
@@ -194,6 +202,14 @@ public class ScreenCaptureAppState
 
     public void setApp(MlAutoVirt app) {
         this.app = app;
+    }
+
+    public MlAutoVirtState getState() {
+        return state;
+    }
+
+    public void setState(MlAutoVirtState state) {
+        this.state = state;
     }
 
 }
