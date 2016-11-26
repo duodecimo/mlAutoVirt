@@ -41,6 +41,8 @@ public class MlAutoVirt extends SimpleApplication {
     //Materials
     private Material matRock;
     private BitmapText hudText;
+    //Result
+    private int result;
 
     public MlAutoVirt() {
         super(new ConfigAppState());
@@ -90,6 +92,7 @@ public class MlAutoVirt extends SimpleApplication {
         hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
         guiNode.attachChild(hudText);
         screenCaptureAppState.initialize(renderManager, viewPort);
+        screenCaptureAppState.setApp(this);
     }
 
     public ScreenshotAppState getScreenshotAppState() {
@@ -174,6 +177,15 @@ public class MlAutoVirt extends SimpleApplication {
 
     public Node getCarNode() {
         return carNode;
+    }
+
+    public int getResult() {
+        result = inputAppState.getAngleIndex();
+        return result;
+    }
+
+    public void setResult(int result) {
+        this.result = result;
     }
 
 }

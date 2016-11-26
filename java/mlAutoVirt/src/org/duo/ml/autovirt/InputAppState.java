@@ -131,7 +131,7 @@ public class InputAppState
         this.speed = speed;
     }
 
-    public float getAngleIndex() {
+    public int getAngleIndex() {
         return angleIndex;
     }
 

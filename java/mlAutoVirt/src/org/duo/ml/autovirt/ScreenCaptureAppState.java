@@ -25,7 +25,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,11 +50,13 @@ public class ScreenCaptureAppState
     private BufferedImage bigGrayBufferedImage;
     // scaled gray shades
     private BufferedImage grayBufferedImage;
+    private MlAutoVirt app;
     // stringBuilder to store all bytes in Octave format
     private StringBuilder stringBuilderBytes;
+    private StringBuilder stringBuilderResults;
     private int dataLinesCount;
     private int dataColumnsCount;
-    private File file;
+    private File fileX, fileY;
     private float scaleFactor;
 
     @Override
@@ -84,6 +85,7 @@ public class ScreenCaptureAppState
                 BufferedImage.TYPE_BYTE_GRAY);
         dataLinesCount = 0;
         stringBuilderBytes = new StringBuilder();
+        stringBuilderResults = new StringBuilder();
         vp.addProcessor(this);
         initialized = true;
         System.out.println("original width = " + widthOriginal +
@@ -109,6 +111,7 @@ public class ScreenCaptureAppState
 
     @Override
     public void postFrame(FrameBuffer out) {
+        int result = app.getResult();
         byteBuffer.clear();
         renderer.readFrameBuffer(out, byteBuffer);
         synchronized (bufferedImage) {
@@ -141,29 +144,41 @@ public class ScreenCaptureAppState
                         stringBuilderBytes.append("\n");
                     }
                 }
+                stringBuilderResults.append(result).append("\n");
             }
         }
     }
 
     private void writeToFile() {
         try {
-            file = File.createTempFile("mlAutoVirt", ".txt");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            System.out.println("Temporary file: "
-                    + file.getAbsoluteFile().toString()
-                    + "(" + widthScaled
-                    + "x" + heightScaled + ")");
-
-            StringBuilder stringBuilderHeader = new StringBuilder();
-            stringBuilderHeader.append("# name: x\n");
+            fileX = File.createTempFile("mlAutoVirtX", ".txt");
+            BufferedWriter writerY;
+            StringBuilder stringBuilderHeader;
+            try (BufferedWriter writerX = new BufferedWriter(new FileWriter(fileX))) {
+                fileY = File.createTempFile("mlAutoVirtY", ".txt");
+                writerY = new BufferedWriter(new FileWriter(fileY));
+                System.out.println("Temporary files: "
+                        + fileX.getAbsoluteFile().toString()
+                        + "(" + widthScaled
+                        + "x" + heightScaled + ") and " +
+                        fileY.getAbsoluteFile().toString());
+                stringBuilderHeader = new StringBuilder();
+                stringBuilderHeader.append("# name: x\n");
+                stringBuilderHeader.append("# type: matrix\n");
+                stringBuilderHeader.append("# rows: ").
+                        append(dataLinesCount).append("\n");
+                writerX.append(stringBuilderHeader);
+                writerX.append(stringBuilderBytes);
+            }
+            stringBuilderHeader = new StringBuilder();
+            stringBuilderHeader.append("# name: y\n");
             stringBuilderHeader.append("# type: matrix\n");
-            stringBuilderHeader.append("# rows: "
-                    + dataLinesCount + "\n");
-            stringBuilderHeader.append("# columns: "
-                    + dataColumnsCount + "\n");
-            writer.append(stringBuilderHeader);
-            writer.append(stringBuilderBytes);
-            writer.close();
+            stringBuilderHeader.append("# rows: ").
+                    append(dataLinesCount).append("\n");
+            stringBuilderHeader.append("# columns: 1\n");
+            writerY.append(stringBuilderHeader);
+            writerY.append(stringBuilderResults);
+            writerY.close();
         } catch (IOException ex) {
             Logger.getLogger(ScreenCaptureAppState.class.getName()).
                     log(Level.SEVERE, null, ex);
@@ -176,4 +191,9 @@ public class ScreenCaptureAppState
         super.cleanup();
         initialized = false;
     }
+
+    public void setApp(MlAutoVirt app) {
+        this.app = app;
+    }
+
 }
