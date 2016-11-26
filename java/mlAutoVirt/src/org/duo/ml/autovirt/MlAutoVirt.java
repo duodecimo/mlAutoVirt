@@ -26,13 +26,10 @@ import com.jme3.util.SkyFactory;
  */
 public class MlAutoVirt extends SimpleApplication {
 
-    public static enum DirectionEnum {LEFTMOST, LEFTMID, LEFTMIN, CENTER, RIGHTMIN, RIGHTMID, RIGHTMOST};
-
     private Node carNode;
     private Spatial car;
     private CameraNode cameraNode;
     private float carSpeed;
-    private DirectionEnum directionEnum;
     private InputAppState inputAppState;
     private ScreenshotAppState screenshotAppState;
     private ScreenCaptureAppState screenCaptureAppState;
@@ -43,9 +40,7 @@ public class MlAutoVirt extends SimpleApplication {
     private Node terrain;
     //Materials
     private Material matRock;
-    private Material matBullet;
     private BitmapText hudText;
-    private String direction;
 
     public MlAutoVirt() {
         super(new ConfigAppState());
@@ -104,22 +99,8 @@ public class MlAutoVirt extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
-        direction = "...|...";
-        if(directionEnum == DirectionEnum.RIGHTMOST) {
-            direction = "...|>>>";
-        } else if(directionEnum == DirectionEnum.RIGHTMID) {
-            direction = "...|>>.";
-        } else if(directionEnum == DirectionEnum.RIGHTMIN) {
-            direction = "...|>..";
-        } else if(directionEnum == DirectionEnum.LEFTMIN) {
-            direction = "..<|...";
-        } else if(directionEnum == DirectionEnum.LEFTMID) {
-            direction = ".<<|...";
-        } else if(directionEnum == DirectionEnum.LEFTMOST) {
-            direction = "<<<|...";
-        }
         hudText.setText("Speed: " + getInputAppState().getSpeed()
-                + " angle: " + direction
+                + " angle: " + getInputAppState().getAngleIndex()
                 + " pos: (" + carNode.getLocalTranslation().x + ", "
                 + carNode.getLocalTranslation().y + ", "
                 + carNode.getLocalTranslation().z + ")");
@@ -193,14 +174,6 @@ public class MlAutoVirt extends SimpleApplication {
 
     public Node getCarNode() {
         return carNode;
-    }
-
-    public DirectionEnum getDirectionEnum() {
-        return directionEnum;
-    }
-
-    public void setDirectionEnum(DirectionEnum directionEnum) {
-        this.directionEnum = directionEnum;
     }
 
 }
