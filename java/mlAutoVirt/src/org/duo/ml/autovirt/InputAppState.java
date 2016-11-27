@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package org.duo.ml.autovirt;
 
 import com.jme3.app.Application;
@@ -28,6 +29,7 @@ public class InputAppState
     private InputManager inputManager;
     private float speed;
     private float angle;
+    private float oldAngle;
     private final float MAXSPEED = 6.0f;
     private final float INCSPEED = 2.0f;
     private final float MAXANGLE = 0.09f;
@@ -69,6 +71,7 @@ public class InputAppState
         addInputMappings();
         speed = 0.0f;
         angle = 0.0f;
+        oldAngle = angle;
         this.app = (MlAutoVirt) app;
         angleIndex = 4;
         // table for angle value lookup
@@ -106,13 +109,13 @@ public class InputAppState
                 if(angleIndex<1) {
                     angleIndex = 1;
                 }
-                angle = angleValues[angleIndex-1];
+                setAngle(angleValues[angleIndex-1]);
             } else if (name.equals(InputMapping.RotateRight.name())) {
                 angleIndex++;
                 if(angleIndex>7) {
                     angleIndex = 7;
                 }
-                angle = angleValues[angleIndex-1];
+                setAngle(angleValues[angleIndex-1]);
             } else if (name.equals(InputMapping.Print.name())) {
                 if (isPressed) {
                 //((Main) app).getScreenshotAppState().takeScreenshot();
@@ -153,6 +156,22 @@ public class InputAppState
 
     public float getAngle() {
         return angle;
+    }
+
+    public void setAngle(float angle) {
+        this.angle = angle;
+        // if angle has changed
+        // turn the steer
+        float turn = 0.0f;
+        if (angle > oldAngle) {
+            turn = 0.03f;
+        } else if (angle > oldAngle) {
+            turn = -0.03f;
+        }
+        app.getVolante().rotate(
+                new Quaternion().fromAngleNormalAxis(
+                        turn, Vector3f.UNIT_Z));
+        oldAngle = angle;
     }
 
 }

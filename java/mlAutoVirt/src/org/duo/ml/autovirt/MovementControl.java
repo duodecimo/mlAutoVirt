@@ -28,14 +28,15 @@ public class MovementControl extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        if(oldAngle != app.getInputAppState().getAngle()) {
+        if (oldAngle != app.getInputAppState().getAngle()) {
             oldAngle = app.getInputAppState().getAngle();
             app.getVolante().rotate(
-                    new Quaternion().fromAngleNormalAxis(oldAngle, Vector3f.UNIT_Z));
+                    new Quaternion().fromAngleNormalAxis(
+                            oldAngle, Vector3f.UNIT_Z));
         }
         direction = app.getCamera().getDirection().normalizeLocal();
-        if(app.getInputAppState().
-                getSpeed()!=0.0f) {
+        if (app.getInputAppState().
+                getSpeed() != 0.0f) {
             app.getCarNode().rotate(0.0f, app.getInputAppState().getAngle() * tpf, 0.0f);
         }
         app.getCarNode().move(direction.multLocal(app.getInputAppState().
