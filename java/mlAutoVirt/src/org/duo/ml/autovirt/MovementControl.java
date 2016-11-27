@@ -16,7 +16,7 @@ import com.jme3.scene.control.AbstractControl;
  * @author duo
  */
 public class MovementControl extends AbstractControl {
-    private MlAutoVirt app;
+    private final MlAutoVirt app;
     private Vector3f direction;
     private float oldAngle;
     
