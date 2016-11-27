@@ -31,7 +31,7 @@ public class MovementControl extends AbstractControl {
         if(oldAngle != app.getInputAppState().getAngle()) {
             oldAngle = app.getInputAppState().getAngle();
             app.getVolante().rotate(
-                    new Quaternion().fromAngleAxis(oldAngle, Vector3f.UNIT_Z));
+                    new Quaternion().fromAngleNormalAxis(oldAngle, Vector3f.UNIT_Z));
         }
         direction = app.getCamera().getDirection().normalizeLocal();
         if(app.getInputAppState().

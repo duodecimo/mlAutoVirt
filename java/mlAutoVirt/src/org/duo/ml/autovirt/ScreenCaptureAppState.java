@@ -174,6 +174,8 @@ public class ScreenCaptureAppState
                     stringBuilderHeader.append("# type: matrix\n");
                     stringBuilderHeader.append("# rows: ").
                             append(dataLinesCount).append("\n");
+                    stringBuilderHeader.append("# columns: ").
+                            append(dataColumnsCount).append("\n");
                     writerX.append(stringBuilderHeader);
                     writerX.append(stringBuilderBytes);
                 }
