@@ -29,6 +29,7 @@ public class MlAutoVirt extends SimpleApplication {
 
     private Node carNode;
     private Spatial car;
+    private Spatial volante;
     private CameraNode cameraNode;
     private float carSpeed;
     private InputAppState inputAppState;
@@ -62,7 +63,7 @@ public class MlAutoVirt extends SimpleApplication {
         stateManager.attach(inputAppState);
         screenCaptureAppState = new ScreenCaptureAppState();
         stateManager.attach(screenCaptureAppState);
-        car = assetManager.loadModel("Models/Carroblend01.j3o");
+        car = assetManager.loadModel("Models/Carroblend.j3o");
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
         car.setMaterial(mat);
         car.setCullHint(Spatial.CullHint.Never);
@@ -70,6 +71,11 @@ public class MlAutoVirt extends SimpleApplication {
         Quaternion quaternion = new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y);
         car.rotate(quaternion);
         car.setLocalTranslation(0.0f, 2.0f, 0.0f);
+        ((Node) car).getChildren().stream().forEach((child) -> {
+            ((Node) child).getChildren().stream().filter((child2) -> (child2.getName().equals("Volante"))).forEach((child2) -> {
+                volante = child2;
+            }); //System.out.println(child2.getName());
+        });
         carNode = new Node("carNode");
         carNode.attachChild(car);
         carNode.setLocalTranslation(0.0f, 0.8f, 0.0f);
@@ -191,6 +197,14 @@ public class MlAutoVirt extends SimpleApplication {
 
     public void setState(MlAutoVirtState state) {
         this.screenCaptureAppState.setState(state);
+    }
+
+    public Spatial getVolante() {
+        return volante;
+    }
+
+    public void setVolante(Spatial volante) {
+        this.volante = volante;
     }
 
 }

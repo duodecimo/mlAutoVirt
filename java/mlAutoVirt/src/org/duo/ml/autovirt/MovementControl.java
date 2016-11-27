@@ -5,6 +5,7 @@
  */
 package org.duo.ml.autovirt;
 
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -15,15 +16,23 @@ import com.jme3.scene.control.AbstractControl;
  * @author duo
  */
 public class MovementControl extends AbstractControl {
-    MlAutoVirt app;
-    Vector3f direction;
+    private MlAutoVirt app;
+    private Vector3f direction;
+    private float oldAngle;
+    
 
     public MovementControl(MlAutoVirt app) {
         this.app = app;
+        oldAngle = 0.0f;
     }
 
     @Override
     protected void controlUpdate(float tpf) {
+        if(oldAngle != app.getInputAppState().getAngle()) {
+            oldAngle = app.getInputAppState().getAngle();
+            app.getVolante().rotate(
+                    new Quaternion().fromAngleAxis(oldAngle, Vector3f.UNIT_Z));
+        }
         direction = app.getCamera().getDirection().normalizeLocal();
         if(app.getInputAppState().
                 getSpeed()!=0.0f) {
