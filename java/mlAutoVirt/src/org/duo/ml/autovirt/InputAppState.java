@@ -163,15 +163,15 @@ public class InputAppState
         // if angle has changed
         // turn the steer
         float turn = 0.0f;
-        if (angle > oldAngle) {
+        if(angle > oldAngle) {
             turn = 0.03f;
-        } else if (angle > oldAngle) {
+        } else if(angle > oldAngle) {
             turn = -0.03f;
         }
         app.getVolante().rotate(
                 new Quaternion().fromAngleNormalAxis(
                         turn, Vector3f.UNIT_Z));
-        oldAngle = angle;
+            oldAngle = angle;
     }
 
 }
