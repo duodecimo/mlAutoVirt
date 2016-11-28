@@ -38,7 +38,7 @@ import org.duo.ml.util.NeuralNetwork;
 public class ScreenCaptureAppState
         extends AbstractAppState
         implements SceneProcessor {
-
+    
     private MlAutoVirtState state;
     private Renderer renderer;
     private int widthOriginal;
@@ -63,7 +63,7 @@ public class ScreenCaptureAppState
     private float scaleFactor;
     private NeuralNetwork neuralNetwork;
     private double[] prediction;
-
+    
     @Override
     public void initialize(RenderManager rm, ViewPort vp) {
         System.out.println("ScreenCaptureAppState initialized!");
@@ -74,14 +74,14 @@ public class ScreenCaptureAppState
         scaleFactor = 0.025F;
         widthScaled = ((int) (widthOriginal * scaleFactor));
         heightScaled = ((int) (heightOriginal * scaleFactor));
-        byteBuffer = BufferUtils.createByteBuffer(widthOriginal *
-                heightOriginal * 4);
+        byteBuffer = BufferUtils.createByteBuffer(widthOriginal
+                * heightOriginal * 4);
         // original image
-        bufferedImage = new BufferedImage(widthOriginal, 
+        bufferedImage = new BufferedImage(widthOriginal,
                 heightOriginal,
                 BufferedImage.TYPE_4BYTE_ABGR);
         // store gray shades
-        bigGrayBufferedImage = new BufferedImage(widthOriginal, 
+        bigGrayBufferedImage = new BufferedImage(widthOriginal,
                 heightOriginal,
                 BufferedImage.TYPE_BYTE_GRAY);
         // scaled gray shades
@@ -95,27 +95,27 @@ public class ScreenCaptureAppState
         // initial state
         state = MlAutoVirtState.IDLE;
         initialized = true;
-        System.out.println("original width = " + widthOriginal +
-                " height = " + heightOriginal +
-                " total = " + widthOriginal * heightOriginal +
-                " scaled width = " + widthScaled +
-                " height = " + heightScaled +
-                " total = " + widthScaled * heightScaled);
+        System.out.println("original width = " + widthOriginal
+                + " height = " + heightOriginal
+                + " total = " + widthOriginal * heightOriginal
+                + " scaled width = " + widthScaled
+                + " height = " + heightScaled
+                + " total = " + widthScaled * heightScaled);
     }
-
+    
     @Override
     public void reshape(ViewPort vp, int w, int h) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public void preFrame(float tpf) {
     }
-
+    
     @Override
     public void postQueue(RenderQueue rq) {
     }
-
+    
     @Override
     public void postFrame(FrameBuffer out) {
         int result = app.getResult();
@@ -126,18 +126,18 @@ public class ScreenCaptureAppState
             if (System.currentTimeMillis() - millis > 2000) {
                 millis = System.currentTimeMillis();
                 //each 2 seconds
-                ColorConvertOp op = 
-                        new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+                ColorConvertOp op
+                        = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
                 op.filter(bufferedImage, bigGrayBufferedImage);
-                AffineTransform affineTransform = 
-                        new AffineTransform();
+                AffineTransform affineTransform
+                        = new AffineTransform();
                 affineTransform.scale(scaleFactor, scaleFactor);
                 AffineTransformOp scaleOp
                         = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
                 scaleOp.filter(bigGrayBufferedImage, grayBufferedImage);
                 WritableRaster raster = grayBufferedImage.getRaster();
-                DataBufferByte data = 
-                        (DataBufferByte) raster.getDataBuffer();
+                DataBufferByte data
+                        = (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
                 // decision based on state
                 if (state == MlAutoVirtState.CAPTURING) {
@@ -154,37 +154,45 @@ public class ScreenCaptureAppState
                         }
                     }
                     stringBuilderResults.append(result).append("\n");
-                } else if(state == MlAutoVirtState.AUTODRIVING) {
+                } else if (state == MlAutoVirtState.AUTODRIVING) {
                     predict(rawPixels);
                 }
             }
         }
     }
-
+    
     private synchronized void predict(byte[] rawPixels) {
+        System.out.println("predicting ...");
+        if (neuralNetwork == null) {
+            // instantiate the neural network
+            neuralNetwork = new NeuralNetwork("/tmp/Theta1.dat", "/tmp/Theta2.dat");
+        }
         if (neuralNetwork != null) {
+            System.out.println("neural ok!");
             prediction = neuralNetwork.predict(rawPixels);
             double result = prediction[0];
             int predictionIndex = 0;
             boolean confidence = false;
-            for(int i=0; i<7; i++) {
-                if(prediction[i] >= result) {
+            for (int i = 0; i < 7; i++) {
+                if (prediction[i] >= result) {
                     result = prediction[i];
-                    predictionIndex = i+1;
-                    if(result >= 0.4f) {
+                    predictionIndex = i + 1;
+                    if (result >= 0.4f) {
                         confidence = true;
                     }
                 }
             }
-            if(confidence) {
+            if (confidence) {
                 app.getInputAppState().setAngleIndex(predictionIndex);
                 System.out.println("predicted index: " + predictionIndex);
             } else {
                 System.out.println("no confidence but would predict: " + predictionIndex);
             }
+        } else {
+            System.out.println("neural kaput :(");
         }
     }
-
+    
     private void writeToFile() {
         if (dataLinesCount > 0) {
             try {
@@ -222,32 +230,30 @@ public class ScreenCaptureAppState
                 dataLinesCount = 0;
                 stringBuilderBytes = new StringBuilder();
                 stringBuilderResults = new StringBuilder();
-                // instantiate the neural network
-                neuralNetwork = new NeuralNetwork("/tmp/Theta1.dat", "/tmp/Theta2.dat");
             } catch (IOException ex) {
                 Logger.getLogger(ScreenCaptureAppState.class.getName()).
                         log(Level.SEVERE, null, ex);
             }
         }
     }
-
+    
     @Override
     public void cleanup() {
         writeToFile();
         super.cleanup();
         initialized = false;
     }
-
+    
     public void setApp(MlAutoVirt app) {
         this.app = app;
     }
-
+    
     public MlAutoVirtState getState() {
         return state;
     }
-
+    
     public void setState(MlAutoVirtState state) {
         this.state = state;
     }
-
+    
 }
