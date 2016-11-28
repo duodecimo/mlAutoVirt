@@ -9,4 +9,4 @@ package org.duo.ml.util;
  *
  * @author duo
  */
-public enum MlAutoVirtState {IDLE, LEARNING, AUTODRIVING}
+public enum MlAutoVirtState {IDLE, CAPTURING, AUTODRIVING}

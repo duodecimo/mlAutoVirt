@@ -95,8 +95,9 @@ public class MlAutoVirt extends SimpleApplication {
         hudText = new BitmapText(guiFont, false);
         hudText.setSize(guiFont.getCharSet().getRenderedSize());      // font size
         hudText.setColor(ColorRGBA.Blue);                             // font color
-        hudText.setText("ML AutoVirt");          // the text
-        hudText.setLocalTranslation(300, hudText.getLineHeight(), 0); // position
+        hudText.setText("ML AutoVirt");
+        hudText.setSize(25);
+        hudText.setLocalTranslation(400, hudText.getLineHeight() * 2, 0); // position
         guiNode.attachChild(hudText);
         screenCaptureAppState.initialize(renderManager, viewPort);
         screenCaptureAppState.setApp(this);
@@ -105,11 +106,15 @@ public class MlAutoVirt extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
-        hudText.setText("Speed: " + getInputAppState().getSpeed()
-                + " angle: " + getInputAppState().getAngleIndex()
-                + " pos: (" + carNode.getLocalTranslation().x + ", "
-                + carNode.getLocalTranslation().y + ", "
-                + carNode.getLocalTranslation().z + ")");
+        hudText.setText("State: " + this.screenCaptureAppState.getState().name()
+                + " (I = idle, C = capturing, A = auto)\n"
+                + "Speed: " + getInputAppState().getSpeed()
+                //+ " angle: " + getInputAppState().getAngleIndex()
+                //+ " pos: (" + carNode.getLocalTranslation().x + ", "
+                //+ carNode.getLocalTranslation().y + ", "
+                //+ carNode.getLocalTranslation().z 
+                //+ ")"
+        );
     }
 
     private void createTerrain() {

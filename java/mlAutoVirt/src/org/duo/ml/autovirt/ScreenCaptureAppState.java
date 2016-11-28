@@ -136,7 +136,7 @@ public class ScreenCaptureAppState
                 DataBufferByte data = 
                         (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
-                if (state == MlAutoVirtState.LEARNING) {
+                if (state == MlAutoVirtState.CAPTURING) {
                     dataColumnsCount = rawPixels.length;
                     dataLinesCount++;
                     int b;

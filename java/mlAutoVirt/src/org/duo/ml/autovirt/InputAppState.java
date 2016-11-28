@@ -27,7 +27,7 @@ public class InputAppState
     private InputManager inputManager;
     private float speed;
     private float angle;
-    private final float MAXSPEED = 6.0f;
+    private final float MAXSPEED = 10.0f;
     private final float INCSPEED = 2.0f;
     private int angleIndex;
     private float[] angleValues;
@@ -51,7 +51,7 @@ public class InputAppState
         inputManager.addMapping(InputMapping.Idle.name(),
                 new KeyTrigger(KeyInput.KEY_I));
         inputManager.addMapping(InputMapping.Learning.name(),
-                new KeyTrigger(KeyInput.KEY_L));
+                new KeyTrigger(KeyInput.KEY_C));
         inputManager.addMapping(InputMapping.AutoDriving.name(),
                 new KeyTrigger(KeyInput.KEY_A));
         for(InputMapping i : InputMapping.values()) {
@@ -118,7 +118,7 @@ public class InputAppState
             } else if (name.equals(InputMapping.Idle.name())) {
                 app.setState(MlAutoVirtState.IDLE);
             } else if (name.equals(InputMapping.Learning.name())) {
-                app.setState(MlAutoVirtState.LEARNING);
+                app.setState(MlAutoVirtState.CAPTURING);
             } else if (name.equals(InputMapping.AutoDriving.name())) {
                 app.setState(MlAutoVirtState.AUTODRIVING);
             }
