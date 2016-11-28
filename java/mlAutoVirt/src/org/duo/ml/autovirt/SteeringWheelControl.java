@@ -19,7 +19,6 @@ import com.jme3.scene.control.AbstractControl;
 public class SteeringWheelControl extends AbstractControl {
 
     private final MlAutoVirt app;
-    private int angleIndex;
     private final Quaternion rollLeft;
     private final Quaternion rollRight;
     private final Quaternion steering;
