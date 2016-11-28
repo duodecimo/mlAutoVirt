@@ -136,6 +136,7 @@ public class ScreenCaptureAppState
                 DataBufferByte data = 
                         (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
+                // decision based on state
                 if (state == MlAutoVirtState.CAPTURING) {
                     dataColumnsCount = rawPixels.length;
                     dataLinesCount++;
@@ -188,6 +189,10 @@ public class ScreenCaptureAppState
                 writerY.append(stringBuilderHeader);
                 writerY.append(stringBuilderResults);
                 writerY.close();
+                // reset line counter, bytes and results capture
+                dataLinesCount = 0;
+                stringBuilderBytes = new StringBuilder();
+                stringBuilderResults = new StringBuilder();
             } catch (IOException ex) {
                 Logger.getLogger(ScreenCaptureAppState.class.getName()).
                         log(Level.SEVERE, null, ex);
