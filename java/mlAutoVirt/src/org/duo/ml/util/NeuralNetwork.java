@@ -22,19 +22,19 @@ public class NeuralNetwork {
     private final RealMatrix theta2Transpose;
 
     public NeuralNetwork(String theta1FileName, String theta2FileName) {
-        this.theta1Transpose = loadMatrixFromOctaveDatFile(theta1FileName);
-        this.theta2Transpose = loadMatrixFromOctaveDatFile(theta2FileName);
+        this.theta1Transpose = loadMatrixFromOctaveDatFile(theta1FileName).transpose();
+        this.theta2Transpose = loadMatrixFromOctaveDatFile(theta2FileName).transpose();
     }
 
-    public double[] predict(byte[] features) {
-        double[] xs = new double[features.length + 1];
+    public double[] predict(byte[] rawBytes) {
+        double[] xs = new double[rawBytes.length + 1];
         xs[0] = 1.0;
-        for (int i = 0; i < features.length; i++) {
-            xs[i + 1] = features[i] < 0 ? 256 + (double) features[i]
-                    : (double) features[i];
+        for (int i = 0; i < rawBytes.length; i++) {
+            xs[i + 1] = rawBytes[i] < 0 ? 256 + (double) rawBytes[i]
+                    : (double) rawBytes[i];
         }
 
-        RealMatrix x = new Array2DRowRealMatrix(1, features.length + 1);
+        RealMatrix x = new Array2DRowRealMatrix(1, rawBytes.length + 1);
         x.setRow(0, xs);
 
         RealMatrix h1 = sigmoidAddOnes(x.multiply(theta1Transpose));

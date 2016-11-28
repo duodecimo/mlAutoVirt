@@ -173,7 +173,9 @@ public class ScreenCaptureAppState
             double result = prediction[0];
             int predictionIndex = 0;
             boolean confidence = false;
+            System.out.println("predictions");
             for (int i = 0; i < 7; i++) {
+                System.out.print(" " + i + "= " + prediction[i]);
                 if (prediction[i] >= result) {
                     result = prediction[i];
                     predictionIndex = i + 1;
@@ -182,9 +184,11 @@ public class ScreenCaptureAppState
                     }
                 }
             }
+            System.out.println("");
             if (confidence) {
                 app.getInputAppState().setAngleIndex(predictionIndex);
-                System.out.println("predicted index: " + predictionIndex);
+                System.out.println("predicted index: " + predictionIndex + "   "
+                + prediction.toString());
             } else {
                 System.out.println("no confidence but would predict: " + predictionIndex);
             }
