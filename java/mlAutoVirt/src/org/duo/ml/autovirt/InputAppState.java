@@ -14,8 +14,6 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import org.duo.ml.util.MlAutoVirtState;
 
 /**
@@ -29,11 +27,8 @@ public class InputAppState
     private InputManager inputManager;
     private float speed;
     private float angle;
-    private float oldAngle;
     private final float MAXSPEED = 6.0f;
     private final float INCSPEED = 2.0f;
-    private final float MAXANGLE = 0.09f;
-    private final float INCANGLE = 0.03f;
     private int angleIndex;
     private float[] angleValues;
     
@@ -71,7 +66,6 @@ public class InputAppState
         addInputMappings();
         speed = 0.0f;
         angle = 0.0f;
-        oldAngle = angle;
         this.app = (MlAutoVirt) app;
         angleIndex = 4;
         // table for angle value lookup
@@ -160,18 +154,6 @@ public class InputAppState
 
     public void setAngle(float angle) {
         this.angle = angle;
-        // if angle has changed
-        // turn the steer
-        float turn = 0.0f;
-        if(angle > oldAngle) {
-            turn = 0.03f;
-        } else if(angle > oldAngle) {
-            turn = -0.03f;
-        }
-        app.getVolante().rotate(
-                new Quaternion().fromAngleNormalAxis(
-                        turn, Vector3f.UNIT_Z));
-            oldAngle = angle;
     }
 
 }

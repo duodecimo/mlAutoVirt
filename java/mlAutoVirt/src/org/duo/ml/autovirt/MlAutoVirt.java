@@ -1,7 +1,6 @@
 package org.duo.ml.autovirt;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.font.BitmapText;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
@@ -33,7 +32,6 @@ public class MlAutoVirt extends SimpleApplication {
     private CameraNode cameraNode;
     private float carSpeed;
     private InputAppState inputAppState;
-    private ScreenshotAppState screenshotAppState;
     private ScreenCaptureAppState screenCaptureAppState;
     public long shtIndex = 0L;
 
@@ -74,6 +72,7 @@ public class MlAutoVirt extends SimpleApplication {
         ((Node) car).getChildren().stream().forEach((child) -> {
             ((Node) child).getChildren().stream().filter((child2) -> (child2.getName().equals("Volante"))).forEach((child2) -> {
                 volante = child2;
+                volante.addControl(new SteeringWheelControl(this));
             }); //System.out.println(child2.getName());
         });
         carNode = new Node("carNode");
@@ -92,6 +91,7 @@ public class MlAutoVirt extends SimpleApplication {
         carSpeed = 0.0f;
         rootNode.attachChild(carNode);
         carNode.setLocalTranslation(120.449646f, -38.18f, 116.01076f);
+        //volante.rotate(new Quaternion().fromAngleAxis(-90*FastMath.DEG_TO_RAD, Vector3f.UNIT_Z));
         hudText = new BitmapText(guiFont, false);
         hudText.setSize(guiFont.getCharSet().getRenderedSize());      // font size
         hudText.setColor(ColorRGBA.Blue);                             // font color
@@ -100,10 +100,6 @@ public class MlAutoVirt extends SimpleApplication {
         guiNode.attachChild(hudText);
         screenCaptureAppState.initialize(renderManager, viewPort);
         screenCaptureAppState.setApp(this);
-    }
-
-    public ScreenshotAppState getScreenshotAppState() {
-        return screenshotAppState;
     }
 
     @Override
@@ -205,6 +201,10 @@ public class MlAutoVirt extends SimpleApplication {
 
     public void setVolante(Spatial volante) {
         this.volante = volante;
+    }
+
+    public ScreenCaptureAppState getScreenCaptureAppState() {
+        return screenCaptureAppState;
     }
 
 }

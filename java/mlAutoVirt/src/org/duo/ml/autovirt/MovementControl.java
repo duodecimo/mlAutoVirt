@@ -18,22 +18,14 @@ import com.jme3.scene.control.AbstractControl;
 public class MovementControl extends AbstractControl {
     private final MlAutoVirt app;
     private Vector3f direction;
-    private float oldAngle;
     
 
     public MovementControl(MlAutoVirt app) {
         this.app = app;
-        oldAngle = 0.0f;
     }
 
     @Override
     protected void controlUpdate(float tpf) {
-        if (oldAngle != app.getInputAppState().getAngle()) {
-            oldAngle = app.getInputAppState().getAngle();
-            app.getVolante().rotate(
-                    new Quaternion().fromAngleNormalAxis(
-                            oldAngle, Vector3f.UNIT_Z));
-        }
         direction = app.getCamera().getDirection().normalizeLocal();
         if (app.getInputAppState().
                 getSpeed() != 0.0f) {
