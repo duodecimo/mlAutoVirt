@@ -11,7 +11,10 @@ num_labels = 7;             % 7 labels: the seven possible angles of the virtual
 % y.dat contains the corresponding values of steer angles of a virtual car corresponding to
 % captured images in X.dat.
 
-load('y.dat');
+load('Y.dat');
+
+fprintf("y size: ");
+size(y)
 
 load('X.dat');
 
@@ -20,8 +23,6 @@ m = size(X, 1);
 %duo debug 17 Out 2016
 fprintf("X size: ");
 size(X)
-fprintf("y size: ");
-size(y)
 
 % Randomly select 8 data points to display
 sel = randperm(size(X, 1));
@@ -64,5 +65,5 @@ pred = predict(Theta1, Theta2, X);
 
 fprintf('\nTraining Set Accuracy: %f\n', mean(double(pred == y)) * 100);
 
-save "Theta1.dat" Theta1
-save "Theta2.dat" Theta2
+save "/tmp/Theta1.dat" Theta1
+save "/tmp/Theta2.dat" Theta2
