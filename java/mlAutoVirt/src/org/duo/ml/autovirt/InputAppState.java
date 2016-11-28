@@ -148,6 +148,10 @@ public class InputAppState
         return angleIndex;
     }
 
+    public void setAngleIndex(int angleIndex) {
+        this.angleIndex = angleIndex;
+    }
+
     public float getAngle() {
         return angle;
     }

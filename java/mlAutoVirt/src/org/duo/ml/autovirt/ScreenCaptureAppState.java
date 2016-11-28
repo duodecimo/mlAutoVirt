@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.duo.ml.util.MlAutoVirtState;
+import org.duo.ml.util.NeuralNetwork;
 
 /**
  *
@@ -60,6 +61,8 @@ public class ScreenCaptureAppState
     private int dataColumnsCount;
     private File fileX, fileY;
     private float scaleFactor;
+    private NeuralNetwork neuralNetwork;
+    private double[] prediction;
 
     @Override
     public void initialize(RenderManager rm, ViewPort vp) {
@@ -151,7 +154,33 @@ public class ScreenCaptureAppState
                         }
                     }
                     stringBuilderResults.append(result).append("\n");
+                } else if(state == MlAutoVirtState.AUTODRIVING) {
+                    predict(rawPixels);
                 }
+            }
+        }
+    }
+
+    private synchronized void predict(byte[] rawPixels) {
+        if (neuralNetwork != null) {
+            prediction = neuralNetwork.predict(rawPixels);
+            double result = prediction[0];
+            int predictionIndex = 0;
+            boolean confidence = false;
+            for(int i=0; i<7; i++) {
+                if(prediction[i] >= result) {
+                    result = prediction[i];
+                    predictionIndex = i+1;
+                    if(result >= 0.4f) {
+                        confidence = true;
+                    }
+                }
+            }
+            if(confidence) {
+                app.getInputAppState().setAngleIndex(predictionIndex);
+                System.out.println("predicted index: " + predictionIndex);
+            } else {
+                System.out.println("no confidence but would predict: " + predictionIndex);
             }
         }
     }
@@ -193,6 +222,8 @@ public class ScreenCaptureAppState
                 dataLinesCount = 0;
                 stringBuilderBytes = new StringBuilder();
                 stringBuilderResults = new StringBuilder();
+                // instantiate the neural network
+                neuralNetwork = new NeuralNetwork("/tmp/Theta1.dat", "/tmp/Theta2.dat");
             } catch (IOException ex) {
                 Logger.getLogger(ScreenCaptureAppState.class.getName()).
                         log(Level.SEVERE, null, ex);
