@@ -22,10 +22,40 @@ public class NeuralNetwork {
     private final RealMatrix theta2Transpose;
 
     public NeuralNetwork(String theta1FileName, String theta2FileName) {
+        // Theta1 and Theta2 are the final weights resulting
+        // from the neural network trainning.
+        // Theta1 size is input_layer_size x hidden_layer_size.
+        // Theta2 size is hidden_layer_size x num_labels.
+        // Both matrices are transposed to use on predict:
         this.theta1Transpose = loadMatrixFromOctaveDatFile(theta1FileName).transpose();
         this.theta2Transpose = loadMatrixFromOctaveDatFile(theta2FileName).transpose();
     }
 
+    /**
+     * predict
+     * @param rawBytes
+     * @return a double[] vector with the percentual predicted
+     * for each possible result.
+     * 
+     * original code:
+     * 
+     * function p = predict(Theta1, Theta2, X)
+     * %PREDICT Predict the label of an input given a trained neural network
+     * %   p = PREDICT(Theta1, Theta2, X) outputs the predicted label of X given the
+     * %   trained weights of a neural network (Theta1, Theta2)
+     * 
+     * % Useful values
+     * m = size(X, 1);
+     * num_labels = size(Theta2, 1);
+     * 
+     * % You need to return the following variables correctly 
+     * p = zeros(size(X, 1), 1);
+     * 
+     * h1 = sigmoid([ones(m, 1) X] * Theta1');
+     * h2 = sigmoid([ones(m, 1) h1] * Theta2');
+     * [dummy, p] = max(h2, [], 2);
+     * 
+     */
     public double[] predict(byte[] rawBytes) {
         double[] xs = new double[rawBytes.length + 1];
         xs[0] = 1.0;
@@ -38,7 +68,8 @@ public class NeuralNetwork {
         x.setRow(0, xs);
 
         RealMatrix h1 = sigmoidAddOnes(x.multiply(theta1Transpose));
-        RealMatrix h2 = sigmoid(h1.multiply(theta2Transpose));
+        //RealMatrix h2 = sigmoid(h1.multiply(theta2Transpose));
+        RealMatrix h2 = sigmoidAddOnes(h1.multiply(theta2Transpose));
         double[] out = new double[h2.getColumnDimension()];
         for (int z = 0; z < h2.getColumnDimension(); z++) {
             out[z] = h2.getEntry(0, z);
@@ -118,7 +149,7 @@ public class NeuralNetwork {
                     if (!created && rows > 0 && cols > 0) {
                         realMatrix = new Array2DRowRealMatrix(rows, cols);
                         created = true;
-                    } else {
+                    } else if(!created) {
                         System.err.println("Unexpected non-header read at line "
                                 + lineNumberReader.getLineNumber() + ":" + filename);
                         throw new IOException("Invalid file format");
