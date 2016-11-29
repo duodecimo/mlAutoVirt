@@ -170,13 +170,13 @@ public class ScreenCaptureAppState
         if (neuralNetwork != null) {
             System.out.println("neural ok!");
             prediction = neuralNetwork.predict(rawPixels);
-            //double result = prediction[0];
-            double result = prediction[1];
+            double result = prediction[0];
+            //double result = prediction[1];
             int predictionIndex = 0;
             boolean confidence = false;
             System.out.println("predictions");
-            //for (int i = 0; i < 7; i++) {
-            for (int i = 1; i < 7; i++) {
+            for (int i = 0; i < 7; i++) {
+            //for (int i = 1; i < 7; i++) {
                 System.out.print(" " + i + "= " + prediction[i]);
                 if (prediction[i] >= result) {
                     result = prediction[i];

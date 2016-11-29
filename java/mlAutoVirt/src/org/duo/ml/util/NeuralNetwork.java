@@ -68,8 +68,8 @@ public class NeuralNetwork {
         x.setRow(0, xs);
 
         RealMatrix h1 = sigmoidAddOnes(x.multiply(theta1Transpose));
-        //RealMatrix h2 = sigmoid(h1.multiply(theta2Transpose));
-        RealMatrix h2 = sigmoidAddOnes(h1.multiply(theta2Transpose));
+        RealMatrix h2 = sigmoid(h1.multiply(theta2Transpose));
+        //RealMatrix h2 = sigmoidAddOnes(h1.multiply(theta2Transpose));
         double[] out = new double[h2.getColumnDimension()];
         for (int z = 0; z < h2.getColumnDimension(); z++) {
             out[z] = h2.getEntry(0, z);
