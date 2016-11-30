@@ -71,7 +71,9 @@ public class ScreenCaptureAppState
         millis = System.currentTimeMillis();
         widthOriginal = vp.getCamera().getWidth();
         heightOriginal = vp.getCamera().getHeight();
-        scaleFactor = 0.025F;
+        // set the proportion for scaling the image
+        //scaleFactor = 0.025F;
+        scaleFactor = 0.0125F;
         widthScaled = ((int) (widthOriginal * scaleFactor));
         heightScaled = ((int) (heightOriginal * scaleFactor));
         byteBuffer = BufferUtils.createByteBuffer(widthOriginal
@@ -215,7 +217,7 @@ public class ScreenCaptureAppState
                             + "x" + heightScaled + ") and "
                             + fileY.getAbsoluteFile().toString());
                     stringBuilderHeader = new StringBuilder();
-                    stringBuilderHeader.append("# name: x\n");
+                    stringBuilderHeader.append("# name: X\n");
                     stringBuilderHeader.append("# type: matrix\n");
                     stringBuilderHeader.append("# rows: ").
                             append(dataLinesCount).append("\n");

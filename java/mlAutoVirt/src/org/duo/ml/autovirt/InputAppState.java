@@ -153,7 +153,7 @@ public class InputAppState
     }
 
     public float getAngle() {
-        return angleValues[angleIndex];
+        return angleValues[angleIndex-1];
     }
 
     public void setAngle(float angle) {
