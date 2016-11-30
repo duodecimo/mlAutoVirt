@@ -73,7 +73,7 @@ public class ScreenCaptureAppState
         heightOriginal = vp.getCamera().getHeight();
         // set the proportion for scaling the image
         //scaleFactor = 0.025F;
-        scaleFactor = 0.0125F;
+        scaleFactor = 0.025F;
         widthScaled = ((int) (widthOriginal * scaleFactor));
         heightScaled = ((int) (heightOriginal * scaleFactor));
         byteBuffer = BufferUtils.createByteBuffer(widthOriginal
