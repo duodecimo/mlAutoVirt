@@ -19,7 +19,9 @@ fprintf("X size: ");
 size(X)
 
 input_layer_size  = size(X, 2);    % each image contains the number of columns of matrix X pixels.
-hidden_layer_size = 64;     % arbitrary 64 hidden units
+%hidden_layer_size = 64;     % arbitrary 64 hidden units
+hidden_layer_size = 25;     % arbitrary 25 hidden units
+%num_labels = 10;
 num_labels = 7;             % 7 labels: the seven possible angles of the virtual car steer.
 
 
@@ -31,7 +33,8 @@ sel = randperm(size(X, 1));
 sel = sel(1:8);
 
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
-displayData(X(sel, 1:end), 16);
+%displayData(X(sel, :));
+displayData(X(sel, 1:end), 32);
 
 initial_Theta1 = randInitializeWeights(input_layer_size, hidden_layer_size);
 initial_Theta2 = randInitializeWeights(hidden_layer_size, num_labels);
@@ -40,8 +43,10 @@ initial_Theta2 = randInitializeWeights(hidden_layer_size, num_labels);
 initial_nn_params = [initial_Theta1(:) ; initial_Theta2(:)];
 
 fprintf('\nTraining Neural Network... \n')
-options = optimset('MaxIter', 100);
-lambda = 1000;
+%options = optimset('MaxIter', 100);
+options = optimset('MaxIter', 50);
+%lambda = 1000;
+lambda = 1;
 
 % Create "short hand" for the cost function to be minimized
 costFunction = @(p) nnCostFunction(p, ...
@@ -61,7 +66,8 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
                  num_labels, (hidden_layer_size + 1));
 
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
-displayData(Theta1(:, 2:end), 16);
+%displayData(Theta1(:, 2:end), 32);
+%displayData(Theta1(:, 2:end));
 
 pred = predict(Theta1, Theta2, X);
 
