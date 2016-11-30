@@ -4,32 +4,34 @@
 %% Initialization
 clear ; close all; clc
 
-input_layer_size  = 576;    % each image contains 576 pixels (32 x 18).
-hidden_layer_size = 64;     % 64 hidden units
-num_labels = 7;             % 7 labels: the seven possible angles of the virtual car steer.
-
-% y.dat contains the corresponding values of steer angles of a virtual car corresponding to
+% Y.dat contains the corresponding values of steer angles of a virtual car corresponding to
 % captured images in X.dat.
 
 load('Y.dat');
-
 fprintf("y size: ");
 size(y)
 
+% X.dat contains the corresponding values of captured image bytes.
+
 load('X.dat');
-
-m = size(X, 1);
-
 %duo debug 17 Out 2016
 fprintf("X size: ");
 size(X)
+
+input_layer_size  = size(X, 2);    % each image contains the number of columns of matrix X pixels.
+hidden_layer_size = 64;     % arbitrary 64 hidden units
+num_labels = 7;             % 7 labels: the seven possible angles of the virtual car steer.
+
+
+m = size(X, 1);
+
 
 % Randomly select 8 data points to display
 sel = randperm(size(X, 1));
 sel = sel(1:8);
 
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
-displayData(X(sel, 1:end), 32);
+displayData(X(sel, 1:end), 16);
 
 initial_Theta1 = randInitializeWeights(input_layer_size, hidden_layer_size);
 initial_Theta2 = randInitializeWeights(hidden_layer_size, num_labels);
@@ -59,7 +61,7 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
                  num_labels, (hidden_layer_size + 1));
 
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
-displayData(Theta1(:, 2:end), 32);
+displayData(Theta1(:, 2:end), 16);
 
 pred = predict(Theta1, Theta2, X);
 
