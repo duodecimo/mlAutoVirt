@@ -62,7 +62,8 @@ public class MlAutoVirt extends SimpleApplication {
         screenCaptureAppState = new ScreenCaptureAppState();
         stateManager.attach(screenCaptureAppState);
         car = assetManager.loadModel("Models/Carroblend.j3o");
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", ColorRGBA.Blue);
         car.setMaterial(mat);
         car.setCullHint(Spatial.CullHint.Never);
         car.scale(2.0f);
@@ -73,6 +74,9 @@ public class MlAutoVirt extends SimpleApplication {
             ((Node) child).getChildren().stream().filter((child2) -> (child2.getName().equals("Volante"))).forEach((child2) -> {
                 volante = child2;
                 volante.addControl(new SteeringWheelControl(this));
+            Material mat2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            mat2.setColor("Color", ColorRGBA.Red);
+            volante.setMaterial(mat2);
             }); //System.out.println(child2.getName());
         });
         carNode = new Node("carNode");

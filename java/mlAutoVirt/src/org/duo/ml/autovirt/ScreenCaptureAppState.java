@@ -132,7 +132,7 @@ public class ScreenCaptureAppState
         renderer.readFrameBuffer(out, byteBuffer);
         synchronized (bufferedImage) {
             Screenshots.convertScreenShot(byteBuffer, bufferedImage);
-            if (System.currentTimeMillis() - millis > 2000) {
+            if (System.currentTimeMillis() - millis > 500) {
                 millis = System.currentTimeMillis();
                 //each 2 seconds
                 ColorConvertOp op
@@ -158,7 +158,8 @@ public class ScreenCaptureAppState
                     dataLinesCount++;
                     int b;
                     for (int k = 0; k < rawPixels.length; k++) {
-                        b = rawPixels[k] & 0xFF;
+                        //b = rawPixels[k] & 0xFF;
+                        b = rawPixels[k];
                         stringBuilderBytes.append(b);
                         if (k < rawPixels.length - 1) {
                             stringBuilderBytes.append(" ");
@@ -281,9 +282,10 @@ private class VideoSurfacePanel extends JPanel {
         private VideoSurfacePanel() {
             setBackground(Color.black);
             setOpaque(true);
-            setPreferredSize(new Dimension(widthScaled, heightScaled));
-            setMinimumSize(new Dimension(widthScaled, heightScaled));
-            setMaximumSize(new Dimension(widthScaled, heightScaled));
+            setPreferredSize(new Dimension(widthOriginal, heightOriginal));
+            setMinimumSize(new Dimension(widthOriginal, heightOriginal));
+            setMaximumSize(new Dimension(widthOriginal, heightOriginal));
+            
             JFrame jFrame = new JFrame();
             jFrame.getContentPane().add(this);
             jFrame.pack();
@@ -293,7 +295,7 @@ private class VideoSurfacePanel extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D)g;
-            g2.drawImage(grayBufferedImage, null, 0, 0);
+            g2.drawImage(bigGrayBufferedImage, null, 0, 0);
         }
     }
 }
