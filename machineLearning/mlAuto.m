@@ -14,6 +14,9 @@ size(y)
 % X.dat contains the corresponding values of captured image bytes.
 
 load('X.dat');
+
+X = ((X < 0) .* (X + 256)) + ((X >= 0) .* (X));
+
 %duo debug 17 Out 2016
 fprintf("X size: ");
 size(X)
@@ -28,13 +31,14 @@ num_labels = 7;             % 7 labels: the seven possible angles of the virtual
 m = size(X, 1);
 
 
-% Randomly select 8 data points to display
+% Randomly select 16 data points to display
 sel = randperm(size(X, 1));
-sel = sel(1:8);
+sel = sel(1:16);
 
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
 %displayData(X(sel, :));
-displayData(X(sel, 1:end), 32);
+displayData(X(sel, 1:end), 18);
+pause;
 
 initial_Theta1 = randInitializeWeights(input_layer_size, hidden_layer_size);
 initial_Theta2 = randInitializeWeights(hidden_layer_size, num_labels);
