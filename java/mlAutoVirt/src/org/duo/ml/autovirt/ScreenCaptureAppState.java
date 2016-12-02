@@ -14,6 +14,10 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.util.BufferUtils;
 import com.jme3.util.Screenshots;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -28,6 +32,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import org.duo.ml.util.MlAutoVirtState;
 import org.duo.ml.util.NeuralNetwork;
 
@@ -63,6 +69,7 @@ public class ScreenCaptureAppState
     private float scaleFactor;
     private NeuralNetwork neuralNetwork;
     private double[] prediction;
+    private VideoSurfacePanel videoSurfacePanel;
     
     @Override
     public void initialize(RenderManager rm, ViewPort vp) {
@@ -141,6 +148,10 @@ public class ScreenCaptureAppState
                 DataBufferByte data
                         = (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
+                if(videoSurfacePanel == null) {
+                    videoSurfacePanel = new VideoSurfacePanel();
+                }
+                videoSurfacePanel.repaint();
                 // decision based on state
                 if (state == MlAutoVirtState.CAPTURING) {
                     dataColumnsCount = rawPixels.length;
@@ -265,4 +276,24 @@ public class ScreenCaptureAppState
         this.state = state;
     }
     
+private class VideoSurfacePanel extends JPanel {
+
+        private VideoSurfacePanel() {
+            setBackground(Color.black);
+            setOpaque(true);
+            setPreferredSize(new Dimension(widthScaled, heightScaled));
+            setMinimumSize(new Dimension(widthScaled, heightScaled));
+            setMaximumSize(new Dimension(widthScaled, heightScaled));
+            JFrame jFrame = new JFrame();
+            jFrame.getContentPane().add(this);
+            jFrame.pack();
+            jFrame.setVisible(initialized);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D)g;
+            g2.drawImage(grayBufferedImage, null, 0, 0);
+        }
+    }
 }
