@@ -94,7 +94,8 @@ public class MlAutoVirt extends SimpleApplication {
         carNode.attachChild(cameraNode);
         carSpeed = 0.0f;
         rootNode.attachChild(carNode);
-        carNode.setLocalTranslation(120.449646f, -38.18f, 116.01076f);
+        //carNode.setLocalTranslation(120.449646f, -38.18f, 116.01076f);
+        carNode.setLocalTranslation(176.66153f, -38.67323f, -83.04963f);
         //volante.rotate(new Quaternion().fromAngleAxis(-90*FastMath.DEG_TO_RAD, Vector3f.UNIT_Z));
         hudText = new BitmapText(guiFont, false);
         hudText.setSize(guiFont.getCharSet().getRenderedSize());      // font size
@@ -110,14 +111,15 @@ public class MlAutoVirt extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
+        hudText.setColor(ColorRGBA.White);
         hudText.setText("State: " + this.screenCaptureAppState.getState().name()
                 + " (I = idle, C = capturing, A = auto)\n"
                 + "Speed: " + getInputAppState().getSpeed()
                 //+ " angle: " + getInputAppState().getAngleIndex()
-                //+ " pos: (" + carNode.getLocalTranslation().x + ", "
-                //+ carNode.getLocalTranslation().y + ", "
-                //+ carNode.getLocalTranslation().z 
-                //+ ")"
+                + " pos: (" + carNode.getLocalTranslation().x + ", "
+                + carNode.getLocalTranslation().y + ", "
+                + carNode.getLocalTranslation().z 
+                + ")"
         );
     }
 
@@ -136,7 +138,7 @@ public class MlAutoVirt extends SimpleApplication {
         grass.setWrap(Texture.WrapMode.Repeat);
         matRock.setTexture("DiffuseMap", grass);
         matRock.setFloat("DiffuseMap_0_scale", 64);
-        Texture paint = assetManager.loadTexture("Textures/Terrain/Alpha/paint.png");
+        Texture paint = assetManager.loadTexture("Textures/Terrain/Alpha/paint4.png");
         paint.setWrap(Texture.WrapMode.Repeat);
         matRock.setTexture("DiffuseMap_1", paint);
         matRock.setFloat("DiffuseMap_1_scale", 16);

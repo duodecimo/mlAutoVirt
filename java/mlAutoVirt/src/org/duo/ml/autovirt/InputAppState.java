@@ -70,13 +70,13 @@ public class InputAppState
         angleIndex = 4;
         // table for angle value lookup
         angleValues = new float[7];
-        angleValues[0] = 0.09f;
-        angleValues[1] = 0.06f;
-        angleValues[2] = 0.03f;
+        angleValues[0] = 0.12f;
+        angleValues[1] = 0.08f;
+        angleValues[2] = 0.04f;
         angleValues[3] = 0.0f;
-        angleValues[4] = -0.03f;
-        angleValues[5] = -0.06f;
-        angleValues[6] = -0.09f;
+        angleValues[4] = -0.04f;
+        angleValues[5] = -0.08f;
+        angleValues[6] = -0.12f;
     }
     
     @Override

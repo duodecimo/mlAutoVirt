@@ -69,7 +69,7 @@ public class ScreenCaptureAppState
     private float scaleFactor;
     private NeuralNetwork neuralNetwork;
     private double[] prediction;
-    private VideoSurfacePanel videoSurfacePanel;
+    //private VideoSurfacePanel videoSurfacePanel;
     
     @Override
     public void initialize(RenderManager rm, ViewPort vp) {
@@ -148,10 +148,10 @@ public class ScreenCaptureAppState
                 DataBufferByte data
                         = (DataBufferByte) raster.getDataBuffer();
                 byte[] rawPixels = data.getData();
-                if(videoSurfacePanel == null) {
-                    videoSurfacePanel = new VideoSurfacePanel();
-                }
-                videoSurfacePanel.repaint();
+                //if(videoSurfacePanel == null) {
+                //    videoSurfacePanel = new VideoSurfacePanel();
+                //}
+                //videoSurfacePanel.repaint();
                 // decision based on state
                 if (state == MlAutoVirtState.CAPTURING) {
                     dataColumnsCount = rawPixels.length;
