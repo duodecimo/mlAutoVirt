@@ -132,9 +132,9 @@ public class ScreenCaptureAppState
         renderer.readFrameBuffer(out, byteBuffer);
         synchronized (bufferedImage) {
             Screenshots.convertScreenShot(byteBuffer, bufferedImage);
-            if (System.currentTimeMillis() - millis > 500) {
+            if (System.currentTimeMillis() - millis > 200) {
                 millis = System.currentTimeMillis();
-                //each 2 seconds
+                //5 times per second
                 ColorConvertOp op
                         = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
                 op.filter(bufferedImage, bigGrayBufferedImage);
@@ -217,11 +217,14 @@ public class ScreenCaptureAppState
     private void writeToFile() {
         if (dataLinesCount > 0) {
             try {
-                fileX = File.createTempFile("mlAutoVirtX", ".txt");
+                String tmpDir = System.getProperty("java.io.tmpdir");
+                //fileX = File.createTempFile("mlAutoVirtX", ".txt");
+                fileX = new File(tmpDir + "/X.dat");
                 BufferedWriter writerY;
                 StringBuilder stringBuilderHeader;
                 try (BufferedWriter writerX = new BufferedWriter(new FileWriter(fileX))) {
-                    fileY = File.createTempFile("mlAutoVirtY", ".txt");
+                    //fileY = File.createTempFile("mlAutoVirtY", ".txt");
+                    fileY = new File(tmpDir + "/Y.dat");
                     writerY = new BufferedWriter(new FileWriter(fileY));
                     System.out.println("Temporary files: "
                             + fileX.getAbsoluteFile().toString()
