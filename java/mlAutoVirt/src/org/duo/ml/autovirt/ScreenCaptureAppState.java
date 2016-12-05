@@ -80,7 +80,7 @@ public class ScreenCaptureAppState
         heightOriginal = vp.getCamera().getHeight();
         // set the proportion for scaling the image
         //scaleFactor = 0.025F;
-        scaleFactor = 0.025F;
+        scaleFactor = 0.05F;
         widthScaled = ((int) (widthOriginal * scaleFactor));
         heightScaled = ((int) (heightOriginal * scaleFactor));
         byteBuffer = BufferUtils.createByteBuffer(widthOriginal
@@ -186,22 +186,22 @@ public class ScreenCaptureAppState
             prediction = neuralNetwork.predict(rawPixels);
             double result = prediction[0];
             //double result = prediction[1];
-            int predictionIndex = 0;
+            int predictionIndex = 0+1;
             boolean confidence = false;
             System.out.println("predictions");
             for (int i = 0; i < 7; i++) {
             //for (int i = 1; i < 7; i++) {
                 System.out.print(" " + i + "= " + prediction[i]);
-                if (prediction[i] >= result) {
+                if (prediction[i] > result) {
                     result = prediction[i];
                     predictionIndex = i + 1;
                     //if (result >= 0.4f) {
-                    if (result >= 0.1f) {
-                        confidence = true;
-                    }
                 }
             }
             System.out.println("");
+            if (result >= 0.1f) {
+                confidence = true;
+            }
             if (confidence) {
                 app.getInputAppState().setAngleIndex(predictionIndex);
                 System.out.println("predicted index: " + predictionIndex + "   "
