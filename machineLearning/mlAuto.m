@@ -37,7 +37,7 @@ sel = sel(1:16);
 
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
 %displayData(X(sel, :));
-displayData(X(sel, 1:end), 18);
+displayData(X(sel, 1:end), 30);
 %pause;
 
 initial_Theta1 = randInitializeWeights(input_layer_size, hidden_layer_size);
@@ -50,7 +50,7 @@ fprintf('\nTraining Neural Network... \n')
 %options = optimset('MaxIter', 100);
 options = optimset('MaxIter', 50);
 %lambda = 1000;
-lambda = 0.3;
+lambda = 1;
 
 % Create "short hand" for the cost function to be minimized
 costFunction = @(p) nnCostFunction(p, ...
@@ -70,7 +70,7 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
                  num_labels, (hidden_layer_size + 1));
 
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
-%displayData(Theta1(:, 2:end), 32);
+%displayData(Theta1(:, 2:end), 30);
 %displayData(Theta1(:, 2:end));
 
 pred = predict(Theta1, Theta2, X);
