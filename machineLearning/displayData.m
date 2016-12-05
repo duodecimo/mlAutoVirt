@@ -49,8 +49,10 @@ for j = 1:display_rows
 end
 
 % Display Image
-h = imagesc(display_array, [-1 1]);
-
+% h = imagesc(display_array, [-1 1]);
+% duo, Dec 2016: I am rotating by 90 degrees and fliping horizontally
+% to compensate the way the bytes arrive
+h = imagesc(flipud(rot90(display_array)), [-1 1]);
 % Do not show axis
 axis image off
 

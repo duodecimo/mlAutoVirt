@@ -7,13 +7,13 @@ clear ; close all; clc
 % Y.dat contains the corresponding values of steer angles of a virtual car corresponding to
 % captured images in X.dat.
 
-load('Y.dat');
+load('/tmp/Y.dat');
 fprintf("y size: ");
 size(y)
 
 % X.dat contains the corresponding values of captured image bytes.
 
-load('X.dat');
+load('/tmp/X.dat');
 
 X = ((X < 0) .* (X + 256)) + ((X >= 0) .* (X));
 
@@ -38,7 +38,7 @@ sel = sel(1:16);
 % To use displayData, you need to modify the displayData function to expect 32 x 18 pixels samples.
 %displayData(X(sel, :));
 displayData(X(sel, 1:end), 18);
-pause;
+%pause;
 
 initial_Theta1 = randInitializeWeights(input_layer_size, hidden_layer_size);
 initial_Theta2 = randInitializeWeights(hidden_layer_size, num_labels);
@@ -50,7 +50,7 @@ fprintf('\nTraining Neural Network... \n')
 %options = optimset('MaxIter', 100);
 options = optimset('MaxIter', 50);
 %lambda = 1000;
-lambda = 1;
+lambda = 0.3;
 
 % Create "short hand" for the cost function to be minimized
 costFunction = @(p) nnCostFunction(p, ...
