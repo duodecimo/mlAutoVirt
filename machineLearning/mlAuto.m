@@ -23,7 +23,8 @@ size(X)
 
 input_layer_size  = size(X, 2);    % each image contains the number of columns of matrix X pixels.
 %hidden_layer_size = 64;     % arbitrary 64 hidden units
-hidden_layer_size = 25;     % arbitrary 25 hidden units
+%hidden_layer_size = 25;     % arbitrary 25 hidden units
+hidden_layer_size = 42;     % arbitrary 25 hidden units
 %num_labels = 10;
 num_labels = 7;             % 7 labels: the seven possible angles of the virtual car steer.
 
