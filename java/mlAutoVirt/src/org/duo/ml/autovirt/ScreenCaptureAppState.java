@@ -132,7 +132,7 @@ public class ScreenCaptureAppState
         renderer.readFrameBuffer(out, byteBuffer);
         synchronized (bufferedImage) {
             Screenshots.convertScreenShot(byteBuffer, bufferedImage);
-            if (System.currentTimeMillis() - millis > 200) {
+            if (System.currentTimeMillis() - millis > 500) {
                 millis = System.currentTimeMillis();
                 //5 times per second
                 ColorConvertOp op
@@ -189,7 +189,8 @@ public class ScreenCaptureAppState
             int predictionIndex = 0+1;
             boolean confidence = false;
             System.out.println("predictions");
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < 3; i++) {
+            //for (int i = 0; i < 7; i++) {
             //for (int i = 1; i < 7; i++) {
                 System.out.print(" " + i + "= " + prediction[i]);
                 if (prediction[i] > result) {

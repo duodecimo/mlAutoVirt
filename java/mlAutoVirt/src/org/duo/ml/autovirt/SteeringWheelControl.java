@@ -33,14 +33,18 @@ public class SteeringWheelControl extends AbstractControl {
         rollRight.fromAngleAxis(-15 * FastMath.DEG_TO_RAD,
                 Vector3f.UNIT_Z);
         steering = new Quaternion();
-        rotation = new float[7];
+        /*        rotation = new float[7];
         rotation[0] = 0.0f;
         rotation[1] = 0.15f;
         rotation[2] = 0.35f;
         rotation[3] = 0.5f;
         rotation[4] = 0.65f;
         rotation[5] = 0.85f;
-        rotation[6] = 1.0f;
+        rotation[6] = 1.0f;*/
+        rotation = new float[3];
+        rotation[0] = 0.0f;
+        rotation[1] = 0.5f;
+        rotation[2] = 1.0f;
     }
 
     @Override

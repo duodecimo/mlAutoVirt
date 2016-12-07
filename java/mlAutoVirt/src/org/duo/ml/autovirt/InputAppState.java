@@ -67,7 +67,7 @@ public class InputAppState
         speed = 0.0f;
         angle = 0.0f;
         this.app = (MlAutoVirt) app;
-        angleIndex = 4;
+        /*        angleIndex = 4;
         // table for angle value lookup
         angleValues = new float[7];
         angleValues[0] = 0.12f;
@@ -76,7 +76,15 @@ public class InputAppState
         angleValues[3] = 0.0f;
         angleValues[4] = -0.04f;
         angleValues[5] = -0.08f;
-        angleValues[6] = -0.12f;
+        angleValues[6] = -0.12f;*/
+        // lets try with only 3 positions
+        // shortening the possible results
+        angleIndex = 2;
+        // table for angle value lookup
+        angleValues = new float[3];
+        angleValues[0] = 0.12f;
+        angleValues[1] = 0.0f;
+        angleValues[2] = -0.12f;
     }
     
     @Override
@@ -99,16 +107,36 @@ public class InputAppState
                     speed = 0.0f;
                 }
             } else if (name.equals(InputMapping.RotateLeft.name())) {
-                angleIndex--;
-                if(angleIndex<1) {
-                    angleIndex = 1;
+                switch(angleIndex) {
+                    case 2:
+                        angleIndex = 1;
+                        break;
+                    case 3:
+                        angleIndex = 2;
+                        break;
+                    case 1:
+                        angleIndex = 1;
                 }
+                //angleIndex--;
+                //if(angleIndex<1) {
+                //    angleIndex = 1;
+                //}
                 setAngle(angleValues[angleIndex-1]);
             } else if (name.equals(InputMapping.RotateRight.name())) {
-                angleIndex++;
-                if(angleIndex>7) {
-                    angleIndex = 7;
+                switch(angleIndex) {
+                    case 2:
+                        angleIndex = 3;
+                        break;
+                    case 3:
+                        angleIndex = 3;
+                        break;
+                    case 1:
+                        angleIndex = 2;
                 }
+                //angleIndex++;
+                //if(angleIndex>7) {
+                //    angleIndex = 7;
+                //}
                 setAngle(angleValues[angleIndex-1]);
             } else if (name.equals(InputMapping.Print.name())) {
                 if (isPressed) {
