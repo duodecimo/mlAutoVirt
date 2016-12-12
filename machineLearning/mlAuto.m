@@ -8,21 +8,25 @@ clear ; close all; clc
 % captured images in X.dat.
 
 load('/tmp/Y.dat');
-fprintf("y size: ");
-size(y)
 
 % X.dat contains the corresponding values of captured image bytes.
 
 load('/tmp/X.dat');
 
+% transform negative bytes into positive ones
 X = ((X < 0) .* (X + 256)) + ((X >= 0) .* (X));
+
+% shuffle (does it works in this case?)
+randV = randperm(size(X));
+X=X(randV,:);
+y=y(randV,:);
 
 %duo debug 17 Out 2016
 fprintf("X size: ");
 size(X)
+fprintf("y size: ");
+size(y)
 
-% shuffle (does it works in this case?)
-X(randperm(end),:)
 
 input_layer_size  = size(X, 2);    % each image contains the number of columns of matrix X pixels.
 hidden_layer_size = 64;     % arbitrary 64 hidden units
